@@ -1,5 +1,5 @@
 let canvas, ctx, animationId, lastTime, fps, interval;
-let namiFrame,
+let waveFrame,
   baseStart,
   baseMiddle,
   baseXRange,
@@ -44,8 +44,8 @@ function setup() {
   canvas = document.querySelector("#canvas");
   ctx = canvas.getContext("2d");
   canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight * 1.5;
-  titleHeight = (canvas.height / 3) * 2;
+  canvas.height = window.innerHeight * 2;
+  titleHeight = window.innerHeight;
   canvas.style.backgroundColor = "#fdf5e6";
   ctx.fillStyle = "#fff";
   ctx.strokeStyle = "#fff";
@@ -54,13 +54,13 @@ function setup() {
   fps = 10;
   interval = 1000 / fps;
 
-  namiFrame = 0;
+  waveFrame = 0;
   baseStart = 0;
   baseXRange = 600;
   baseYRange = 600;
   baseMiddle = canvas.width / 2;
   baseEnd = canvas.width;
-  baseYEnd = (canvas.height / 3) * 2;
+  baseYEnd = (canvas.height / 4) * 2;
   bubbleCount = 200;
   bubblePositions = [...Array(bubbleCount)].map(() => ({
     x: Math.random() * canvas.width,
@@ -91,6 +91,9 @@ function draw() {
   // 海の深いところ
   drawSea();
 
+  // 泡
+  drawBubbles();
+
   // 足跡
   drawFootPrints();
 
@@ -111,7 +114,7 @@ function draw() {
     { text: "A", width: 150 },
   ];
   drawMainTexts(texts);
-  drawSubText("いきたいなぁ〜");
+  drawSubText("いってきたぞ〜");
 }
 
 function drawWaves() {
@@ -124,7 +127,7 @@ function drawWaves() {
      * 値が大きければspeedは小さくなる
      */
     const moveSpeed = moveRange - 20;
-    const offset = moveRange * Math.sin(namiFrame / moveSpeed);
+    const offset = moveRange * Math.sin(waveFrame / moveSpeed);
 
     let waveX = baseStart;
     let waveY = baseStart;
@@ -134,7 +137,7 @@ function drawWaves() {
     ctx.beginPath();
     ctx.moveTo(waveX, waveY);
 
-    while (waveY < canvas.height * 1.5) {
+    while (waveY < canvas.height) {
       const lc1 = {
         x: waveIdx * baseXRange + offset,
         y: waveY - offset,
@@ -163,19 +166,6 @@ function drawWaves() {
     ctx.fill();
     ctx.restore();
   }
-
-  for (let i = 0; i < bubbleCount; i++) {
-    const x = bubblePositions[i].x;
-    const y = bubblePositions[i].y;
-    const radius = bubblePositions[i].radius;
-    const bubbleColor = `rgba(255, 255, 255, ${bubblePositions[i].opacity})`;
-    ctx.save();
-    ctx.beginPath();
-    ctx.fillStyle = bubbleColor;
-    ctx.arc(x, y, radius, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.restore();
-  }
 }
 
 function drawSandyBeach() {
@@ -188,7 +178,7 @@ function drawSandyBeach() {
   ctx.beginPath();
   ctx.moveTo(sandX, sandY);
 
-  while (sandY < canvas.height * 1.5 + offsetS) {
+  while (sandY < canvas.height + offsetS) {
     const lc1 = {
       x: seaIdx * baseXRange + offsetS,
       y: sandY - offsetS,
@@ -265,7 +255,7 @@ function drawSea() {
   ctx.beginPath();
   ctx.moveTo(seaX, seaY);
 
-  while (seaY < canvas.height * 1.5 + offsetF) {
+  while (seaY < canvas.height + offsetF) {
     const lc1 = {
       x: seaIdx * baseXRange + offsetF,
       y: seaY - offsetF,
@@ -289,8 +279,8 @@ function drawSea() {
   ctx.lineTo(0, 0);
   ctx.closePath();
   ctx.filter = "blur(3px)";
-  ctx.strokeStyle = "rgba(0, 141, 183, 0.2)";
-  ctx.fillStyle = "rgba(0, 141, 183, 0.2)";
+  ctx.strokeStyle = "#00afcc";
+  ctx.fillStyle = "#00afcc";
   ctx.stroke();
   ctx.fill();
   ctx.restore();
@@ -330,8 +320,23 @@ function drawSea() {
   // ctx.restore();
 }
 
+function drawBubbles() {
+  for (let i = 0; i < bubbleCount; i++) {
+    const x = bubblePositions[i].x;
+    const y = bubblePositions[i].y;
+    const radius = bubblePositions[i].radius;
+    const bubbleColor = `rgba(255, 255, 255, ${bubblePositions[i].opacity})`;
+    ctx.save();
+    ctx.beginPath();
+    ctx.fillStyle = bubbleColor;
+    ctx.arc(x, y, radius, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+}
+
 function drawFootPrints() {
-  const maxCount = namiFrame / 10;
+  const maxCount = waveFrame / 10;
   let count = 0;
   if (maxCount === 0) return;
 
@@ -503,7 +508,7 @@ function drawMainTexts(texts) {
   const endHue2 = 100;
 
   // 補間値を計算
-  const t = (Math.sin(namiFrame / 20) + 1) / 2; // 0から1までの範囲で循環する値を生成
+  const t = (Math.sin(waveFrame / 20) + 1) / 2; // 0から1までの範囲で循環する値を生成
 
   const hue1 = startHue1 * (1 - t) + endHue1 * t;
   const hue2 = startHue2 * (1 - t) + endHue2 * t;
@@ -691,7 +696,7 @@ function drawStar(cx, cy, spikes, outerRadius, innerRadius, color) {
 }
 
 function update() {
-  namiFrame++;
+  waveFrame++;
 }
 
 function animate(timestamp) {

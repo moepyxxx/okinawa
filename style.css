@@ -11,5 +11,6 @@ canvas {
 }
 
 .container {
-  height: 150vh;
+  height: 200vh;
+  background-color: #00afcc;
 }
