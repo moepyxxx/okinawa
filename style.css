@@ -1,0 +1,15 @@
+body,
+canvas {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  max-width: 100%;
+  max-height: 100%;
+  display: block;
+  overflow: auto; /* スクロールバーを表示 */
+  scroll-behavior: smooth; /* CSSによるスムーズスクロール */
+}
+
+.container {
+  height: 150vh;
+}
