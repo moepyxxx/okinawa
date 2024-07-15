@@ -6,7 +6,6 @@ export class Text extends DrawObject {
   }
 
   drawText(text: string, size: number, x: number, y: number, color = "#fff") {
-    console.log(x, y);
     this.ctx.save();
     this.ctx.font = `${size}px Noto Sans JP`;
     this.ctx.fillStyle = color;
