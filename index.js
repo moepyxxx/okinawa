@@ -16,11 +16,12 @@ let waveFrame,
   isBirdRotating,
   rotateTargetAngle,
   birdAngle,
-  titleHeight;
+  titleHeight,
+  sampleImage;
 
 let lastScrollPosition;
 
-setup();
+await setup();
 animate(0);
 
 window.addEventListener("resize", () => {
@@ -40,11 +41,11 @@ window.addEventListener("scroll", () => {
   lastScrollPosition = currentScrollPosition;
 });
 
-function setup() {
+async function setup() {
   canvas = document.querySelector("#canvas");
   ctx = canvas.getContext("2d");
   canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight * 2;
+  canvas.height = window.innerHeight * 2.5;
   titleHeight = window.innerHeight;
   canvas.style.backgroundColor = "#fdf5e6";
   ctx.fillStyle = "#fff";
@@ -79,6 +80,8 @@ function setup() {
   rotateTargetAngle = 0;
   birdAngle = 0;
   lastScrollPosition = 0;
+
+  sampleImage = await loadImage("./images/sample.jpg");
 }
 
 function draw() {
@@ -114,7 +117,101 @@ function draw() {
     { text: "A", width: 150 },
   ];
   drawMainTexts(texts);
-  drawSubText("いってきたぞ〜");
+  // drawSubText("いってきたぞ〜");
+
+  // 画像
+  const width = (canvas.width - 200 - 40 * 3) / 3;
+  const height = width * (2 / 3);
+  const row1 = canvas.height / 2 + (canvas.height / 2 - (40 + 2 * height)) / 2;
+  const row2 = row1 + height + 40;
+  const imagePositions = [
+    {
+      image: sampleImage,
+      x: 100,
+      y: row1,
+    },
+    {
+      image: sampleImage,
+      x: canvas.width / 2 - width / 2,
+      y: row1,
+    },
+    {
+      image: sampleImage,
+      x: canvas.width - width - 100,
+      y: row1,
+    },
+    {
+      image: sampleImage,
+      x: 100,
+      y: row2,
+    },
+    {
+      image: sampleImage,
+      x: canvas.width / 2 - width / 2,
+      y: row2,
+    },
+    {
+      image: sampleImage,
+      x: canvas.width - width - 100,
+      y: row2,
+    },
+  ];
+  for (let i = 0; i < imagePositions.length; i++) {
+    const { image, x, y } = imagePositions[i];
+    drawRoundedRectImage(image, x, y, width, height, 20);
+  }
+
+  // 雲
+  const cloudPositions = [
+    {
+      shadow: {
+        x: canvas.width - 200,
+        y: canvas.height / 2 + 300,
+      },
+      cloud: {
+        x: canvas.width - 200,
+        y: canvas.height / 2,
+      },
+      size: 1,
+    },
+    {
+      shadow: {
+        x: -300,
+        y: -200 + 150,
+      },
+      cloud: {
+        x: -300,
+        y: -200,
+      },
+      size: 0.6,
+    },
+    {
+      shadow: {
+        x: canvas.width / 5,
+        y: (canvas.height / 7) * 6.5 + 150,
+      },
+      cloud: {
+        x: canvas.width / 5,
+        y: (canvas.height / 7) * 6.5,
+      },
+      size: 0.9,
+    },
+  ];
+  for (let i = 0; i < cloudPositions.length; i++) {
+    const { shadow, cloud, size } = cloudPositions[i];
+    drawCloud(
+      shadow.x,
+      shadow.y,
+      size,
+      "rgba(47, 79, 79, .2)",
+      "rgba(47, 79, 79, .2)",
+      "blur(2px)"
+    );
+    drawCloud(cloud.x, cloud.y, size, "#fafdff", "#efefef");
+  }
+
+  // コピーライト
+  drawCopyRight();
 }
 
 function drawWaves() {
@@ -340,7 +437,7 @@ function drawFootPrints() {
   let count = 0;
   if (maxCount === 0) return;
 
-  while (count < maxCount) {
+  while (count <= maxCount) {
     const { x, y } = footPrintCoordinates[count];
     count % 2 === 0 ? drawRightFootPrint(x, y) : drawLeftFootPrint(x, y);
     count++;
@@ -489,8 +586,8 @@ function drawMainTexts(texts) {
   const startX = (canvas.width - sumWidth) / 2;
 
   // ヒトデ
-  drawStar(startX - 50, titleHeight / 2 - 150, 5, 30, 15, "#e0ffff");
-  drawStar(startX + sumWidth + 50, titleHeight / 2 + 50, 5, 30, 15, "#00bfff");
+  // drawStar(startX - 50, titleHeight / 2 - 150, 5, 30, 15, "#e0ffff");
+  // drawStar(startX + sumWidth + 50, titleHeight / 2 + 50, 5, 30, 15, "#00bfff");
 
   ctx.save();
   const gradient = ctx.createLinearGradient(
@@ -695,6 +792,147 @@ function drawStar(cx, cy, spikes, outerRadius, innerRadius, color) {
   ctx.restore();
 }
 
+function drawCloud(x, y, size, color, strokeColor, blur = "blur(0)") {
+  ctx.save();
+  ctx.moveTo(x + 125 * size, y + 128 * size);
+  ctx.beginPath();
+  ctx.filter = blur;
+  ctx.lineTo(x + 125 * size, y + 128 * size);
+  ctx.bezierCurveTo(
+    x + 130 * size,
+    y + 66 * size,
+    x + 180 * size,
+    y + 63 * size,
+    x + 214 * size,
+    y + 81 * size
+  );
+  ctx.bezierCurveTo(
+    x + 234 * size,
+    y + 37 * size,
+    x + 283 * size,
+    y + 44 * size,
+    x + 300 * size,
+    y + 72 * size
+  );
+  ctx.bezierCurveTo(
+    x + 310 * size,
+    y + 24 * size,
+    x + 368 * size,
+    y + 10 * size,
+    x + 413 * size,
+    y + 44 * size
+  );
+  ctx.bezierCurveTo(
+    x + 462 * size,
+    y + 8 * size,
+    x + 519 * size,
+    y + 16 * size,
+    x + 551 * size,
+    y + 45 * size
+  );
+  ctx.bezierCurveTo(
+    x + 609 * size,
+    y + -13 * size,
+    x + 736 * size,
+    y + 6 * size,
+    x + 736 * size,
+    y + 72 * size
+  );
+  ctx.bezierCurveTo(
+    x + 833 * size,
+    y + 49 * size,
+    x + 890 * size,
+    y + 97 * size,
+    x + 881 * size,
+    y + 160 * size
+  );
+  ctx.bezierCurveTo(
+    x + 974 * size,
+    y + 172 * size,
+    x + 977 * size,
+    y + 267 * size,
+    x + 943 * size,
+    y + 315 * size
+  );
+  ctx.bezierCurveTo(
+    x + 1021 * size,
+    y + 346 * size,
+    x + 1004 * size,
+    y + 456 * size,
+    x + 943 * size,
+    y + 464 * size
+  );
+  ctx.bezierCurveTo(
+    x + 953 * size,
+    y + 553 * size,
+    x + 881 * size,
+    y + 599 * size,
+    x + 816 * size,
+    y + 562 * size
+  );
+  ctx.bezierCurveTo(
+    x + 783 * size,
+    y + 671 * size,
+    x + 700 * size,
+    y + 666 * size,
+    x + 629 * size,
+    y + 625 * size
+  );
+  ctx.bezierCurveTo(
+    x + 558 * size,
+    y + 653 * size,
+    x + 527 * size,
+    y + 625 * size,
+    x + 512 * size,
+    y + 588 * size
+  );
+  ctx.bezierCurveTo(
+    x + 483 * size,
+    y + 633 * size,
+    x + 446 * size,
+    y + 671 * size,
+    x + 361 * size,
+    y + 625 * size
+  );
+  ctx.bezierCurveTo(
+    x + 283 * size,
+    y + 664 * size,
+    x + 181 * size,
+    y + 654 * size,
+    x + 143 * size,
+    y + 577 * size
+  );
+  ctx.bezierCurveTo(
+    x + 15 * size,
+    y + 561 * size,
+    x + -27 * size,
+    y + 499 * size,
+    x + 26 * size,
+    y + 365 * size
+  );
+  ctx.bezierCurveTo(
+    x + -4.5 * size,
+    y + 338 * size,
+    x + -1.5 * size,
+    y + 280 * size,
+    x + 47 * size,
+    y + 269 * size
+  );
+  ctx.bezierCurveTo(
+    x + 30.5 * size,
+    y + 224 * size,
+    x + 19 * size,
+    y + 138 * size,
+    x + 125 * size,
+    y + 128 * size
+  );
+  ctx.fillStyle = color;
+  ctx.strokeStyle = strokeColor;
+  ctx.stroke();
+  ctx.fill();
+  ctx.restore();
+}
+
 function update() {
   waveFrame++;
 }
@@ -742,4 +980,43 @@ function distance(px, py, qx, qy) {
   const x = qx - px;
   const y = qy - py;
   return Math.sqrt(x * x + y * y);
+}
+
+function loadImage(src) {
+  return new Promise((resolve, reject) => {
+    const image = new Image();
+    image.onload = () => resolve(image);
+    image.onerror = (event) => reject(event);
+    image.src = src;
+    return image;
+  });
+}
+
+function drawRoundedRectImage(img, x, y, width, height, radius) {
+  ctx.save();
+  ctx.beginPath();
+  ctx.moveTo(x + radius, y);
+  ctx.lineTo(x + width - radius, y);
+  ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+  ctx.lineTo(x + width, y + height - radius);
+  ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+  ctx.lineTo(x + radius, y + height);
+  ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+  ctx.lineTo(x, y + radius);
+  ctx.quadraticCurveTo(x, y, x + radius, y);
+  ctx.closePath();
+
+  ctx.clip();
+  ctx.drawImage(img, x, y, width, height);
+  ctx.restore();
+}
+
+function drawCopyRight() {
+  ctx.save();
+  ctx.font = "14px ヒラギノ明朝";
+  ctx.fillStyle = "#abb1b5";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText("© 2024 iwa moe", canvas.width / 2, canvas.height - 20);
+  ctx.restore();
 }
