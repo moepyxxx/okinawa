@@ -5,13 +5,23 @@ export class Text extends DrawObject {
     super(canvas, ctx);
   }
 
-  drawText(text: string, size: number, x: number, y: number, color = "#fff") {
+  drawText(
+    text: string,
+    size: number,
+    x: number,
+    y: number,
+    color = "#fff",
+    strokeColor = color
+  ) {
     this.ctx.save();
-    this.ctx.font = `${size}px Noto Sans JP`;
+    this.ctx.font = `bold ${size}px Noto Sans JP`;
     this.ctx.fillStyle = color;
     this.ctx.textAlign = "center";
     this.ctx.textBaseline = "middle";
+    this.ctx.lineWidth = 0.5;
+    this.ctx.strokeStyle = strokeColor;
     this.ctx.fillText(text, x, y);
+    this.ctx.strokeText(text, x, y);
     this.ctx.restore();
   }
 }

@@ -200,9 +200,9 @@ function draw() {
   sea?.drawSandyBeach();
   sea?.drawWaves();
   sea?.drawSea();
-  bubble?.drawBubbles();
-  footPrint?.drawFootPrints();
-  bird?.drawFlyingBird();
+  bubble?.draw();
+  footPrint?.draw();
+  bird?.draw();
   title?.drawSun();
   title?.drawTitle();
   contentImages.forEach((contentImage) => {
@@ -210,10 +210,12 @@ function draw() {
   });
 
   text?.drawText(
-    "／ 沖縄旅行の思い出と魅力をぎゅっとまとめてみました ＼",
+    "／ いえーい！旅行の思い出と魅力をぎゅっとまとめてみました ＼",
     30,
     canvasWidth / 2,
-    window.innerHeight / 2 + 60
+    window.innerHeight / 2 + 60,
+    "rgba(0, 175,204, .5)",
+    "#0068b7"
   );
 
   for (let i = 0; i < cloudPositions.length; i++) {

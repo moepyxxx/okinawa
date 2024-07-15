@@ -29,7 +29,7 @@ export class FootPrint extends DrawObject {
     }
   }
 
-  drawFootPrints() {
+  draw() {
     const maxCount = this.frame / 10;
     let count = 0;
     if (maxCount === 0) return;

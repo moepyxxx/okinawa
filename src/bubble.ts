@@ -23,7 +23,7 @@ export class Bubble extends DrawObject {
     }));
   }
 
-  drawBubbles() {
+  draw() {
     for (let i = 0; i < this.bubbleCount; i++) {
       const x = this.bubblePositions[i].x;
       const y = this.bubblePositions[i].y;

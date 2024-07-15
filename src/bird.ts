@@ -15,7 +15,7 @@ export class Bird extends DrawObject {
     super(canvas, ctx);
   }
 
-  drawFlyingBird() {
+  draw() {
     const speed = 30;
     const offset = 400;
     if (this.isBirdRotating) {

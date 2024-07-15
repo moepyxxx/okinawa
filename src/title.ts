@@ -72,17 +72,57 @@ export class Title extends DrawObject {
 
   drawSun() {
     this.ctx.save();
-    this.ctx.fillStyle = "#fff";
+    this.ctx.fillStyle = "rgba(0, 175,204, .5)";
     this.ctx.beginPath();
     this.ctx.arc(
-      this.startX + 50 / 2,
-      this.titleHeight / 2 - 120,
+      this.startX + 100,
+      this.titleHeight / 2 - 180,
       50,
       0,
       Math.PI * 2
     );
+    this.ctx.closePath();
     this.ctx.fill();
+
+    for (let degree = 0; degree < 360; degree += 15) {
+      const { A, B } = this.getCoordinatesFromAngle(
+        this.startX + 100,
+        this.titleHeight / 2 - 180,
+        degree,
+        70,
+        degree === 0
+          ? this.sumWidth - 100
+          : Math.floor(Math.random() * (150 - 120 + 1)) + 120
+      );
+      this.ctx.strokeStyle = "rgba(0, 175,204, .5)";
+      this.ctx.lineWidth = 3;
+      this.ctx.lineJoin = "round";
+      this.ctx.lineCap = "round";
+      this.ctx.beginPath();
+      this.ctx.moveTo(A.x, A.y);
+      this.ctx.lineTo(B.x, B.y);
+      this.ctx.closePath();
+      this.ctx.stroke();
+    }
     this.ctx.restore();
+  }
+
+  getCoordinatesFromAngle(
+    x: number,
+    y: number,
+    degree: number,
+    distanceA: number,
+    distanceB: number
+  ) {
+    const radian = degree * (Math.PI / 180);
+
+    const Ax = x + distanceA * Math.cos(radian);
+    const Ay = y + distanceA * Math.sin(radian);
+
+    const Bx = x + distanceB * Math.cos(radian);
+    const By = y + distanceB * Math.sin(radian);
+
+    return { A: { x: Ax, y: Ay }, B: { x: Bx, y: By } };
   }
 
   update() {
