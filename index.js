@@ -17,7 +17,13 @@ let waveFrame,
   rotateTargetAngle,
   birdAngle,
   titleHeight,
-  sampleImage;
+  seaCreaturesImage,
+  foodImage,
+  natureImage,
+  seaImage,
+  glassImage,
+  hotelImage,
+  imageSettings;
 
 let lastScrollPosition;
 
@@ -25,7 +31,6 @@ await setup();
 animate(0);
 
 window.addEventListener("resize", () => {
-  console.log("resize");
   setup();
   draw();
 });
@@ -81,7 +86,32 @@ async function setup() {
   birdAngle = 0;
   lastScrollPosition = 0;
 
-  sampleImage = await loadImage("./images/sample.jpg");
+  seaCreaturesImage = await loadImage("./images/sea_creatures.jpeg");
+  foodImage = await loadImage("./images/food.jpeg");
+  natureImage = await loadImage("./images/nature.jpeg");
+  seaImage = await loadImage("./images/sea.jpeg");
+  glassImage = await loadImage("./images/glass.jpeg");
+  hotelImage = await loadImage("./images/hotel.jpeg");
+  imageSettings = [
+    {
+      image: seaCreaturesImage,
+    },
+    {
+      image: foodImage,
+    },
+    {
+      image: natureImage,
+    },
+    {
+      image: seaImage,
+    },
+    {
+      image: glassImage,
+    },
+    {
+      image: hotelImage,
+    },
+  ];
 }
 
 function draw() {
@@ -104,7 +134,7 @@ function draw() {
   fryingBird();
 
   // 後ろの線
-  drawUnderWaveLine();
+  // drawUnderWaveLine();
 
   // テキスト
   const texts = [
@@ -117,7 +147,12 @@ function draw() {
     { text: "A", width: 150 },
   ];
   drawMainTexts(texts);
-  // drawSubText("いってきたぞ〜");
+  drawSubText(
+    "／ 沖縄旅行の思い出と魅力をぎゅっとまとめてみました ＼",
+    30,
+    canvas.width / 2,
+    titleHeight / 2 + 60
+  );
 
   // 画像
   const width = (canvas.width - 200 - 40 * 3) / 3;
@@ -126,39 +161,39 @@ function draw() {
   const row2 = row1 + height + 40;
   const imagePositions = [
     {
-      image: sampleImage,
+      image: natureImage,
       x: 100,
       y: row1,
     },
     {
-      image: sampleImage,
+      image: foodImage,
       x: canvas.width / 2 - width / 2,
       y: row1,
     },
     {
-      image: sampleImage,
+      image: seaImage,
       x: canvas.width - width - 100,
       y: row1,
     },
     {
-      image: sampleImage,
+      image: seaCreaturesImage,
       x: 100,
       y: row2,
     },
     {
-      image: sampleImage,
+      image: hotelImage,
       x: canvas.width / 2 - width / 2,
       y: row2,
     },
     {
-      image: sampleImage,
+      image: glassImage,
       x: canvas.width - width - 100,
       y: row2,
     },
   ];
   for (let i = 0; i < imagePositions.length; i++) {
     const { image, x, y } = imagePositions[i];
-    drawRoundedRectImage(image, x, y, width, height, 20);
+    drawRoundedRectImage(image, x, y, width, height, 20, i);
   }
 
   // 雲
@@ -345,40 +380,6 @@ function drawSea() {
   ctx.stroke();
   ctx.fill();
   ctx.restore();
-
-  // const lp1F = { x: baseStart + offsetF, y: baseStart - offsetF };
-  // const lc1F = {
-  //   x: baseMiddle + offsetF,
-  //   y: baseStart - offsetF,
-  // };
-  // const lc2F = {
-  //   x: baseStart + offsetF,
-  //   y: baseMiddle - offsetF,
-  // };
-  // const lp2F = { x: baseMiddle + offsetF, y: baseMiddle - offsetF };
-  // const lc3F = {
-  //   x: baseEnd + offsetF,
-  //   y: baseMiddle - offsetF,
-  // };
-  // const lc4F = {
-  //   x: baseMiddle + offsetF,
-  //   y: baseYEnd - offsetF,
-  // };
-  // const lp3F = { x: baseEnd - offsetF, y: baseYEnd - offsetF };
-  // ctx.save();
-  // ctx.beginPath();
-  // ctx.filter = "blur(3px)";
-  // ctx.strokeStyle = "rgba(0, 141, 183, 0.2)";
-  // ctx.fillStyle = "rgba(0, 141, 183, 0.2)";
-  // ctx.moveTo(lp1F.x + offsetF, lp1F.y);
-  // ctx.bezierCurveTo(lc1F.x, lc1F.y, lc2F.x, lc2F.y, lp2F.x, lp2F.y);
-  // ctx.bezierCurveTo(lc3F.x, lc3F.y, lc4F.x, lc4F.y, lp3F.x, lp3F.y);
-  // ctx.lineTo(canvas.width, canvas.height);
-  // ctx.lineTo(0, canvas.height);
-  // ctx.lineTo(offsetF, 0);
-  // ctx.stroke();
-  // ctx.fill();
-  // ctx.restore();
 }
 
 function drawBubbles() {
@@ -577,7 +578,7 @@ function drawMainTexts(texts) {
   gradient.addColorStop(0, `hsl(${hue1}, 100%, 42%)`);
   gradient.addColorStop(1, `hsl(${hue2}, 100%, 79%)`);
 
-  ctx.lineWidth = 10;
+  ctx.lineWidth = 12;
   ctx.font = "bold 150px Arial";
   ctx.strokeStyle = gradient;
   ctx.lineJoin = "round";
@@ -592,13 +593,13 @@ function drawMainTexts(texts) {
   ctx.restore();
 }
 
-function drawSubText(text) {
+function drawSubText(text, size, x, y) {
   ctx.save();
-  ctx.font = "30px ヒラギノ明朝";
-  ctx.fillStyle = "#000";
+  ctx.font = `${size}px Noto Sans JP`;
+  ctx.fillStyle = "#fff";
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
-  ctx.fillText(text, canvas.width / 2, titleHeight / 2 + 50);
+  ctx.fillText(text, x, y);
   ctx.restore();
 }
 
@@ -619,7 +620,6 @@ function setFootPrintCoordinates() {
       startY -= 70;
     }
   }
-  console.log(footPrintCoordinates);
 }
 
 function drawUnderWaveLine() {
@@ -957,22 +957,70 @@ function loadImage(src) {
   });
 }
 
-function drawRoundedRectImage(img, x, y, width, height, radius) {
+function drawRoundedRectImage(img, x, y, width, height, radius, index) {
+  // offsetの計算 (-30から30の間を行き来する)
+  const amplitude = 20; // 振幅
+  const frequency = 0.1; // 周波数 (値が小さいほど遅くなる)
+  const offset = amplitude * Math.sin(frequency * waveFrame);
+
   ctx.save();
   ctx.beginPath();
-  ctx.moveTo(x + radius, y);
-  ctx.lineTo(x + width - radius, y);
-  ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
-  ctx.lineTo(x + width, y + height - radius);
-  ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
-  ctx.lineTo(x + radius, y + height);
-  ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
-  ctx.lineTo(x, y + radius);
-  ctx.quadraticCurveTo(x, y, x + radius, y);
+  ctx.moveTo(x + radius, y + offset);
+  ctx.lineTo(x + width - radius, y + offset);
+  ctx.quadraticCurveTo(x + width, y + offset, x + width, y + offset + radius);
+  ctx.lineTo(x + width, y + offset + height - radius);
+  ctx.quadraticCurveTo(
+    x + width,
+    y + offset + height,
+    x + width - radius,
+    y + offset + height
+  );
+  ctx.lineTo(x + radius, y + offset + height);
+  ctx.quadraticCurveTo(x, y + offset + height, x, y + offset + height - radius);
+  ctx.lineTo(x, y + offset + radius);
+  ctx.quadraticCurveTo(x, y + offset, x + radius, y + offset);
   ctx.closePath();
 
   ctx.clip();
-  ctx.drawImage(img, x, y, width, height);
+
+  // アスペクト比固定方法
+  // // 3×2のアスペクト比に合わせて画像をスケーリング
+  // const targetAspectRatio = 3 / 2;
+  // const imgAspectRatio = img.width / img.height;
+
+  // let drawWidth, drawHeight, sourceX, sourceY, sourceWidth, sourceHeight;
+
+  // if (imgAspectRatio > targetAspectRatio) {
+  //   // 画像が横に長い場合、幅を合わせてトリミング
+  //   sourceHeight = img.height;
+  //   sourceWidth = img.height * targetAspectRatio;
+  //   sourceX = (img.width - sourceWidth) / 2;
+  //   sourceY = 0;
+  // } else {
+  //   // 画像が縦に長い場合、高さを合わせてトリミング
+  //   sourceWidth = img.width;
+  //   sourceHeight = img.width / targetAspectRatio;
+  //   sourceX = 0;
+  //   sourceY = (img.height - sourceHeight) / 2;
+  // }
+
+  // drawWidth = width;
+  // drawHeight = height;
+
+  // ctx.drawImage(
+  //   img,
+  //   sourceX,
+  //   sourceY,
+  //   sourceWidth,
+  //   sourceHeight,
+  //   x,
+  //   y + offset,
+  //   drawWidth,
+  //   drawHeight
+  // );
+  // ctx.restore();
+
+  ctx.drawImage(img, x, y + offset, width, height);
   ctx.restore();
 }
 
