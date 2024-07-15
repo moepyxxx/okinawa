@@ -898,6 +898,13 @@ function drawCloud(x, y, size, color, strokeColor, blur = "blur(0)") {
   ctx.restore();
 }
 
+function drawSun(x, y) {
+  ctx.save();
+  ctx.fillStyle = "#fff";
+  ctx.arc(x, y, 50, 0, Math.PI * 2);
+  ctx.restore();
+}
+
 function update() {
   waveFrame++;
 }
