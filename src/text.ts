@@ -10,13 +10,15 @@ export class Text extends DrawObject {
     size: number,
     x: number,
     y: number,
+    align: CanvasTextAlign = "center",
+    bold: string = "",
     color = "#fff",
     strokeColor = color
   ) {
     this.ctx.save();
-    this.ctx.font = `bold ${size}px Noto Sans JP`;
+    this.ctx.font = `${bold} ${size}px Noto Sans JP`;
     this.ctx.fillStyle = color;
-    this.ctx.textAlign = "center";
+    this.ctx.textAlign = align;
     this.ctx.textBaseline = "middle";
     this.ctx.lineWidth = 0.5;
     this.ctx.strokeStyle = strokeColor;

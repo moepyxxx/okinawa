@@ -205,18 +205,41 @@ function draw() {
   bird?.draw();
   title?.drawSun();
   title?.drawTitle();
-  contentImages.forEach((contentImage) => {
-    contentImage.draw();
-  });
-
   text?.drawText(
     "／ いえーい！旅行の思い出と魅力をぎゅっとまとめてみました ＼",
     30,
     canvasWidth / 2,
     window.innerHeight / 2 + 60,
+    "center",
+    "bold",
     "rgba(0, 175,204, .5)",
     "#0068b7"
   );
+
+  text?.drawText(
+    "Contents",
+    60,
+    100,
+    canvasHeight / 2 + 100,
+    "left",
+    "bold",
+    "#fff"
+  );
+  contentImages.forEach((contentImage) => {
+    contentImage.draw();
+  });
+  text?.drawText(
+    "気になる画像をクリックしてみてください",
+    20,
+    100,
+    canvasHeight / 2 + 160,
+    "left",
+    "",
+    "#fff"
+  );
+  contentImages.forEach((contentImage) => {
+    contentImage.draw();
+  });
 
   for (let i = 0; i < cloudPositions.length; i++) {
     const {
@@ -246,6 +269,8 @@ function draw() {
     14,
     canvasWidth / 2,
     canvasHeight - 20,
+    "center",
+    "",
     "#abb1b5"
   );
 }

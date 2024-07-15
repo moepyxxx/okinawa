@@ -7,7 +7,7 @@ export class Bubble extends DrawObject {
     radius: number;
     opacity: number;
   }[] = [];
-  bubbleCount: number = 200;
+  bubbleCount: number = 300;
 
   constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D) {
     super(canvas, ctx);
