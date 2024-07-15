@@ -2,6 +2,7 @@ import { Bird } from "./bird";
 import { Bubble } from "./bubble";
 import { Cloud } from "./cloud";
 import { FootPrint } from "./footPrint";
+import { ContentImage } from "./image";
 import { Sea } from "./sea";
 import { Text } from "./text";
 import { Title } from "./title";
@@ -27,6 +28,7 @@ const cloudPositions: {
   cloud: Position;
   size: number;
 }[] = [];
+const contentImages: ContentImage[] = [];
 
 setup();
 animate(0);
@@ -107,6 +109,88 @@ function setup() {
       },
     ]
   );
+
+  const imageWidth = (canvas.width - 200 - 40 * 3) / 3;
+  const imageHeight = imageWidth * (2 / 3);
+  const row1 =
+    canvas.height / 2 + (canvas.height / 2 - (40 + 2 * imageHeight)) / 2;
+  const row2 = row1 + imageHeight + 40;
+  contentImages.push(
+    ...[
+      new ContentImage(
+        canvas,
+        ctx,
+        "./images/sea_creatures.jpeg",
+        {
+          x: 100,
+          y: row1,
+        },
+        imageWidth,
+        imageHeight,
+        20
+      ),
+      new ContentImage(
+        canvas,
+        ctx,
+        "./images/food.jpeg",
+        {
+          x: canvas.width / 2 - imageWidth / 2,
+          y: row1,
+        },
+        imageWidth,
+        imageHeight,
+        20
+      ),
+      new ContentImage(
+        canvas,
+        ctx,
+        "./images/nature.jpeg",
+        {
+          x: canvas.width - imageWidth - 100,
+          y: row1,
+        },
+        imageWidth,
+        imageHeight,
+        20
+      ),
+      new ContentImage(
+        canvas,
+        ctx,
+        "./images/sea.jpeg",
+        {
+          x: 100,
+          y: row2,
+        },
+        imageWidth,
+        imageHeight,
+        20
+      ),
+      new ContentImage(
+        canvas,
+        ctx,
+        "./images/glass.jpeg",
+        {
+          x: canvas.width / 2 - imageWidth / 2,
+          y: row2,
+        },
+        imageWidth,
+        imageHeight,
+        20
+      ),
+      new ContentImage(
+        canvas,
+        ctx,
+        "./images/hotel.jpeg",
+        {
+          x: canvas.width - imageWidth - 100,
+          y: row2,
+        },
+        imageWidth,
+        imageHeight,
+        20
+      ),
+    ]
+  );
 }
 
 function draw() {
@@ -121,6 +205,9 @@ function draw() {
   bird?.drawFlyingBird();
   title?.drawSun();
   title?.drawTitle();
+  contentImages.forEach((contentImage) => {
+    contentImage.draw();
+  });
 
   text?.drawText(
     "／ 沖縄旅行の思い出と魅力をぎゅっとまとめてみました ＼",
@@ -165,6 +252,9 @@ function update() {
   sea?.update();
   footPrint?.update();
   title?.update();
+  contentImages.forEach((contentImage) => {
+    contentImage.update();
+  });
 }
 
 function animate(timestamp: number) {
