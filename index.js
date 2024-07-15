@@ -304,42 +304,6 @@ function drawSandyBeach() {
   ctx.stroke();
   ctx.fill();
   ctx.restore();
-
-  // const offsetS = 100;
-  // const lp1S = { x: baseStart + offsetS, y: baseStart };
-  // const lc1S = {
-  //   x: baseMiddle + offsetS,
-  //   y: baseStart - offsetS,
-  // };
-  // const lc2S = {
-  //   x: baseStart + offsetS,
-  //   y: baseMiddle - offsetS,
-  // };
-  // const lp2S = { x: baseMiddle + offsetS, y: baseMiddle - offsetS };
-  // const lc3S = {
-  //   x: baseEnd + offsetS,
-  //   y: baseMiddle - offsetS,
-  // };
-  // const lc4S = {
-  //   x: baseMiddle + offsetS,
-  //   y: baseEnd - offsetS,
-  // };
-  // const lp3S = { x: baseEnd + offsetS, y: baseYEnd - offsetS };
-  // ctx.save();
-  // ctx.beginPath();
-  // ctx.filter = "blur(2px)";
-  // ctx.strokeStyle = "#ffefd5";
-  // ctx.fillStyle = "#ffefd5";
-  // ctx.moveTo(lp1S.x + offsetS, lp1S.y);
-  // ctx.bezierCurveTo(lc1S.x, lc1S.y, lc2S.x, lc2S.y, lp2S.x, lp2S.y);
-  // ctx.lineTo(lp2S.x + offsetS, lp2S.y);
-  // ctx.bezierCurveTo(lc3S.x, lc3S.y, lc4S.x, lc4S.y, lp3S.x, lp3S.y);
-  // ctx.lineTo(baseEnd, baseYEnd);
-  // ctx.lineTo(offsetS, baseYEnd);
-  // ctx.lineTo(offsetS, 0);
-  // ctx.stroke();
-  // ctx.fill();
-  // ctx.restore();
 }
 
 function drawSea() {
@@ -437,7 +401,7 @@ function drawFootPrints() {
   let count = 0;
   if (maxCount === 0) return;
 
-  while (count <= maxCount) {
+  while (count <= maxCount && count < footPrintCoordinates.length) {
     const { x, y } = footPrintCoordinates[count];
     count % 2 === 0 ? drawRightFootPrint(x, y) : drawLeftFootPrint(x, y);
     count++;
@@ -643,7 +607,7 @@ function setFootPrintCoordinates() {
   let startY = (titleHeight / 9) * 8;
   footPrintCoordinates = [];
 
-  while (startY > 0 || startX > 0) {
+  while (startY > -20) {
     footPrintCoordinates.push({ x: startX, y: startY });
     startX -= 10;
 
@@ -655,6 +619,7 @@ function setFootPrintCoordinates() {
       startY -= 70;
     }
   }
+  console.log(footPrintCoordinates);
 }
 
 function drawUnderWaveLine() {
