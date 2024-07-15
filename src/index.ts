@@ -215,6 +215,7 @@ function draw() {
     "rgba(0, 175,204, .5)",
     "#0068b7"
   );
+  drawScrollDown();
 
   text?.drawText(
     "Contents",
@@ -272,6 +273,37 @@ function draw() {
     "center",
     "",
     "#abb1b5"
+  );
+}
+
+function drawScrollDown() {
+  if (canvas == null || ctx == null) {
+    throw new Error("cannot get canvas");
+  }
+
+  const canvasWidth = canvas.width;
+  const canvasHeight = canvas.height;
+
+  ctx.save();
+  ctx.beginPath();
+  ctx.lineWidth = 2;
+  ctx.strokeStyle = "#fff";
+
+  ctx.moveTo(canvasWidth / 2, (canvasHeight / 5) * 2 - 160);
+  ctx.lineTo(canvasWidth / 2, (canvasHeight / 5) * 2 - 80);
+  ctx.lineTo(canvas.width / 2 + 20, (canvasHeight / 5) * 2 - 100);
+  ctx.stroke();
+  ctx.closePath();
+  ctx.restore();
+
+  text?.drawText(
+    "scroll down",
+    20,
+    canvasWidth / 2,
+    (canvasHeight / 5) * 2 - 50,
+    "center",
+    "",
+    "#fff"
   );
 }
 

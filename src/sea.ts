@@ -6,9 +6,9 @@ export class Sea extends DrawObject {
   baseYEnd: number;
 
   frame = 0;
-  baseStart = 0;
-  baseXRange = 600;
-  baseYRange = 600;
+  baseStart = 50;
+  baseXRange: number;
+  baseYRange: number;
 
   constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D) {
     super(canvas, ctx);
@@ -16,6 +16,8 @@ export class Sea extends DrawObject {
     this.baseMiddle = this.canvas.width / 2;
     this.baseEnd = this.canvas.width;
     this.baseYEnd = (this.canvas.height / 4) * 2;
+    this.baseXRange = this.canvas.width / 2.5;
+    this.baseYRange = this.canvas.width / 2.5;
   }
 
   update() {
