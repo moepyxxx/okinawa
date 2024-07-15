@@ -41,8 +41,8 @@ export class ContentImage extends DrawObject {
   draw() {
     if (!this.image) return;
 
-    // offsetの計算 (-30から30の間を行き来する)
-    const amplitude = 20; // 振幅
+    // offsetの計算 (-15から15の間を行き来する)
+    const amplitude = 15; // 振幅
     const frequency = 0.1; // 周波数 (値が小さいほど遅くなる)
     const offset = amplitude * Math.sin(frequency * this.frame);
 

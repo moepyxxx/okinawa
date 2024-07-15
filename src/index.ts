@@ -6,7 +6,6 @@ import { ContentImage } from "./image";
 import { Sea } from "./sea";
 import { Text } from "./text";
 import { Title } from "./title";
-import { Position } from "./type";
 
 let canvas: HTMLCanvasElement | null = null;
 let ctx: CanvasRenderingContext2D | null = null;
@@ -15,6 +14,7 @@ let animationId: number | null;
 let lastTime: number = 0;
 let fps: number = 0;
 let interval: number = 0;
+let frame: number = 0;
 
 let sea: Sea | null = null;
 let bubble: Bubble | null = null;
@@ -22,12 +22,7 @@ let footPrint: FootPrint | null = null;
 let bird: Bird | null = null;
 let title: Title | null = null;
 let text: Text | null = null;
-let cloud: Cloud | null = null;
-const cloudPositions: {
-  shadow: Position;
-  cloud: Position;
-  size: number;
-}[] = [];
+const clouds: Cloud[] = [];
 const contentImages: ContentImage[] = [];
 
 setup();
@@ -71,42 +66,48 @@ function setup() {
     { text: "A", width: 150 },
   ]);
   text = new Text(canvas, ctx);
-  cloud = new Cloud(canvas, ctx);
-  cloudPositions.push(
+  // cloud = new Cloud(canvas, ctx);
+  clouds.push(
     ...[
-      {
-        shadow: {
-          x: canvas.width - 200,
-          y: canvas.height / 2 + 300,
-        },
-        cloud: {
+      new Cloud(
+        canvas,
+        ctx,
+        {
           x: canvas.width - 200,
           y: canvas.height / 2,
         },
-        size: 1,
-      },
-      {
-        shadow: {
-          x: -300,
-          y: -200 + 150,
+        {
+          x: canvas.width - 200,
+          y: canvas.height / 2 + 300,
         },
-        cloud: {
+        1
+      ),
+      new Cloud(
+        canvas,
+        ctx,
+        {
           x: -300,
           y: -200,
         },
-        size: 0.6,
-      },
-      {
-        shadow: {
-          x: canvas.width / 5,
-          y: (canvas.height / 7) * 6.5 + 150,
+        {
+          x: -300,
+          y: -200 + 150,
         },
-        cloud: {
+        0.6
+      ),
+      new Cloud(
+        canvas,
+        ctx,
+        {
           x: canvas.width / 5,
           y: (canvas.height / 7) * 6.5,
         },
-        size: 0.9,
-      },
+        {
+          x: canvas.width / 5,
+          y: (canvas.height / 7) * 6.5 + 150,
+        },
+        0.9
+      ),
     ]
   );
 
@@ -241,29 +242,9 @@ function draw() {
   contentImages.forEach((contentImage) => {
     contentImage.draw();
   });
-
-  for (let i = 0; i < cloudPositions.length; i++) {
-    const {
-      shadow: shadowPosition,
-      cloud: cloudPosition,
-      size,
-    } = cloudPositions[i];
-    cloud?.drawCloud(
-      shadowPosition.x,
-      shadowPosition.y,
-      size,
-      "rgba(47, 79, 79, .2)",
-      "rgba(47, 79, 79, .2)",
-      "blur(2px)"
-    );
-    cloud?.drawCloud(
-      cloudPosition.x,
-      cloudPosition.y,
-      size,
-      "#fafdff",
-      "#efefef"
-    );
-  }
+  clouds.forEach((cloud) => {
+    cloud.draw();
+  });
 
   text?.drawText(
     "© 2024 iwa moe",
@@ -289,9 +270,29 @@ function drawScrollDown() {
   ctx.lineWidth = 2;
   ctx.strokeStyle = "#fff";
 
-  ctx.moveTo(canvasWidth / 2, (canvasHeight / 5) * 2 - 160);
-  ctx.lineTo(canvasWidth / 2, (canvasHeight / 5) * 2 - 80);
-  ctx.lineTo(canvas.width / 2 + 20, (canvasHeight / 5) * 2 - 100);
+  const startX = canvasWidth / 2;
+  const startY = (canvasHeight / 5) * 2 - 160;
+
+  const midY = (canvasHeight / 5) * 2 - 80;
+  const endX = canvas.width / 2 + 20;
+  const endY = (canvasHeight / 5) * 2 - 100;
+
+  ctx.moveTo(startX, startY);
+
+  const totalFrames = 30;
+  const progress = (frame % totalFrames) / totalFrames;
+
+  if (progress < 0.5) {
+    const currentY = startY + (midY - startY) * (progress * 2);
+    ctx.lineTo(startX, currentY);
+  } else {
+    ctx.lineTo(startX, midY);
+    const additionalProgress = (progress - 0.4) * 2;
+    const currentX = startX + (endX - startX) * additionalProgress;
+    const currentY = midY + (endY - midY) * additionalProgress;
+    ctx.lineTo(currentX, currentY);
+  }
+
   ctx.stroke();
   ctx.closePath();
   ctx.restore();
@@ -308,11 +309,15 @@ function drawScrollDown() {
 }
 
 function update() {
+  frame++;
   sea?.update();
   footPrint?.update();
   title?.update();
   contentImages.forEach((contentImage) => {
     contentImage.update();
+  });
+  clouds.forEach((cloud) => {
+    cloud.update();
   });
 }
 

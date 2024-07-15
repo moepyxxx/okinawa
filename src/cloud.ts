@@ -2,155 +2,200 @@ import { DrawObject } from "./drawObject";
 import { Position } from "./type";
 
 export class Cloud extends DrawObject {
-  constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D) {
+  frame: number = 0;
+  cloudPosition: Position;
+  shadowPosition: Position;
+  scale: number;
+  initialPhase: number;
+
+  constructor(
+    canvas: HTMLCanvasElement,
+    ctx: CanvasRenderingContext2D,
+    cloudPosition: Position,
+    shadowPosition: Position,
+    scale: number
+  ) {
     super(canvas, ctx);
+    this.cloudPosition = cloudPosition;
+    this.shadowPosition = shadowPosition;
+    this.scale = scale;
+    // 初期位置をセット
+    this.initialPhase = Math.random() * 2 * Math.PI;
+  }
+
+  draw() {
+    // offsetの計算 (-10から10の間を行き来する)
+    const amplitude = 10; // 振幅
+    const frequency = 0.05; // 周波数 (値が小さいほど遅くなる)
+    const offset =
+      amplitude * Math.sin(frequency * this.frame + +this.initialPhase);
+
+    this.drawCloud(
+      this.shadowPosition.x + offset,
+      this.shadowPosition.y,
+      this.scale,
+      "rgba(47, 79, 79, .2)",
+      "rgba(47, 79, 79, .2)",
+      "blur(2px)"
+    );
+    this.drawCloud(
+      this.cloudPosition.x + offset,
+      this.cloudPosition.y,
+      this.scale,
+      "#fafdff",
+      "#efefef"
+    );
   }
 
   drawCloud(
     x: number,
     y: number,
-    size: number,
+    scale: number,
     color: string,
     strokeColor: string,
     blur = "blur(0)"
   ) {
     this.ctx.save();
-    this.ctx.moveTo(x + 125 * size, y + 128 * size);
+    this.ctx.moveTo(x + 125 * scale, y + 128 * scale);
     this.ctx.beginPath();
     this.ctx.filter = blur;
-    this.ctx.lineTo(x + 125 * size, y + 128 * size);
+    this.ctx.lineTo(x + 125 * scale, y + 128 * scale);
     this.ctx.bezierCurveTo(
-      x + 130 * size,
-      y + 66 * size,
-      x + 180 * size,
-      y + 63 * size,
-      x + 214 * size,
-      y + 81 * size
+      x + 130 * scale,
+      y + 66 * scale,
+      x + 180 * scale,
+      y + 63 * scale,
+      x + 214 * scale,
+      y + 81 * scale
     );
     this.ctx.bezierCurveTo(
-      x + 234 * size,
-      y + 37 * size,
-      x + 283 * size,
-      y + 44 * size,
-      x + 300 * size,
-      y + 72 * size
+      x + 234 * scale,
+      y + 37 * scale,
+      x + 283 * scale,
+      y + 44 * scale,
+      x + 300 * scale,
+      y + 72 * scale
     );
     this.ctx.bezierCurveTo(
-      x + 310 * size,
-      y + 24 * size,
-      x + 368 * size,
-      y + 10 * size,
-      x + 413 * size,
-      y + 44 * size
+      x + 310 * scale,
+      y + 24 * scale,
+      x + 368 * scale,
+      y + 10 * scale,
+      x + 413 * scale,
+      y + 44 * scale
     );
     this.ctx.bezierCurveTo(
-      x + 462 * size,
-      y + 8 * size,
-      x + 519 * size,
-      y + 16 * size,
-      x + 551 * size,
-      y + 45 * size
+      x + 462 * scale,
+      y + 8 * scale,
+      x + 519 * scale,
+      y + 16 * scale,
+      x + 551 * scale,
+      y + 45 * scale
     );
     this.ctx.bezierCurveTo(
-      x + 609 * size,
-      y + -13 * size,
-      x + 736 * size,
-      y + 6 * size,
-      x + 736 * size,
-      y + 72 * size
+      x + 609 * scale,
+      y + -13 * scale,
+      x + 736 * scale,
+      y + 6 * scale,
+      x + 736 * scale,
+      y + 72 * scale
     );
     this.ctx.bezierCurveTo(
-      x + 833 * size,
-      y + 49 * size,
-      x + 890 * size,
-      y + 97 * size,
-      x + 881 * size,
-      y + 160 * size
+      x + 833 * scale,
+      y + 49 * scale,
+      x + 890 * scale,
+      y + 97 * scale,
+      x + 881 * scale,
+      y + 160 * scale
     );
     this.ctx.bezierCurveTo(
-      x + 974 * size,
-      y + 172 * size,
-      x + 977 * size,
-      y + 267 * size,
-      x + 943 * size,
-      y + 315 * size
+      x + 974 * scale,
+      y + 172 * scale,
+      x + 977 * scale,
+      y + 267 * scale,
+      x + 943 * scale,
+      y + 315 * scale
     );
     this.ctx.bezierCurveTo(
-      x + 1021 * size,
-      y + 346 * size,
-      x + 1004 * size,
-      y + 456 * size,
-      x + 943 * size,
-      y + 464 * size
+      x + 1021 * scale,
+      y + 346 * scale,
+      x + 1004 * scale,
+      y + 456 * scale,
+      x + 943 * scale,
+      y + 464 * scale
     );
     this.ctx.bezierCurveTo(
-      x + 953 * size,
-      y + 553 * size,
-      x + 881 * size,
-      y + 599 * size,
-      x + 816 * size,
-      y + 562 * size
+      x + 953 * scale,
+      y + 553 * scale,
+      x + 881 * scale,
+      y + 599 * scale,
+      x + 816 * scale,
+      y + 562 * scale
     );
     this.ctx.bezierCurveTo(
-      x + 783 * size,
-      y + 671 * size,
-      x + 700 * size,
-      y + 666 * size,
-      x + 629 * size,
-      y + 625 * size
+      x + 783 * scale,
+      y + 671 * scale,
+      x + 700 * scale,
+      y + 666 * scale,
+      x + 629 * scale,
+      y + 625 * scale
     );
     this.ctx.bezierCurveTo(
-      x + 558 * size,
-      y + 653 * size,
-      x + 527 * size,
-      y + 625 * size,
-      x + 512 * size,
-      y + 588 * size
+      x + 558 * scale,
+      y + 653 * scale,
+      x + 527 * scale,
+      y + 625 * scale,
+      x + 512 * scale,
+      y + 588 * scale
     );
     this.ctx.bezierCurveTo(
-      x + 483 * size,
-      y + 633 * size,
-      x + 446 * size,
-      y + 671 * size,
-      x + 361 * size,
-      y + 625 * size
+      x + 483 * scale,
+      y + 633 * scale,
+      x + 446 * scale,
+      y + 671 * scale,
+      x + 361 * scale,
+      y + 625 * scale
     );
     this.ctx.bezierCurveTo(
-      x + 283 * size,
-      y + 664 * size,
-      x + 181 * size,
-      y + 654 * size,
-      x + 143 * size,
-      y + 577 * size
+      x + 283 * scale,
+      y + 664 * scale,
+      x + 181 * scale,
+      y + 654 * scale,
+      x + 143 * scale,
+      y + 577 * scale
     );
     this.ctx.bezierCurveTo(
-      x + 15 * size,
-      y + 561 * size,
-      x + -27 * size,
-      y + 499 * size,
-      x + 26 * size,
-      y + 365 * size
+      x + 15 * scale,
+      y + 561 * scale,
+      x + -27 * scale,
+      y + 499 * scale,
+      x + 26 * scale,
+      y + 365 * scale
     );
     this.ctx.bezierCurveTo(
-      x + -4.5 * size,
-      y + 338 * size,
-      x + -1.5 * size,
-      y + 280 * size,
-      x + 47 * size,
-      y + 269 * size
+      x + -4.5 * scale,
+      y + 338 * scale,
+      x + -1.5 * scale,
+      y + 280 * scale,
+      x + 47 * scale,
+      y + 269 * scale
     );
     this.ctx.bezierCurveTo(
-      x + 30.5 * size,
-      y + 224 * size,
-      x + 19 * size,
-      y + 138 * size,
-      x + 125 * size,
-      y + 128 * size
+      x + 30.5 * scale,
+      y + 224 * scale,
+      x + 19 * scale,
+      y + 138 * scale,
+      x + 125 * scale,
+      y + 128 * scale
     );
     this.ctx.fillStyle = color;
     this.ctx.strokeStyle = strokeColor;
     this.ctx.stroke();
     this.ctx.fill();
     this.ctx.restore();
+  }
+
+  update() {
+    this.frame++;
   }
 }
