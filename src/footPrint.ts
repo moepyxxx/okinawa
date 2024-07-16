@@ -46,7 +46,7 @@ export class FootPrint extends DrawObject {
   drawRightFootPrint(start: number, end: number) {
     this.ctx.save();
     this.ctx.beginPath();
-    this.ctx.fillStyle = "#a9a9a9";
+    this.ctx.fillStyle = "#eae1cf";
     this.ctx.moveTo(start + 8, end);
     this.ctx.bezierCurveTo(
       start + 29,
@@ -87,7 +87,7 @@ export class FootPrint extends DrawObject {
   drawLeftFootPrint(start: number, end: number) {
     this.ctx.save();
     this.ctx.beginPath();
-    this.ctx.fillStyle = "#a9a9a9";
+    this.ctx.fillStyle = "#eae1cf";
     this.ctx.moveTo(start + 14, end);
     this.ctx.bezierCurveTo(
       start + 26,
