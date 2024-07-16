@@ -6,7 +6,7 @@ export class Sea extends DrawObject {
   baseYEnd: number;
 
   frame = 0;
-  baseStart = 50;
+  baseStart = 0;
   baseXRange: number;
   baseYRange: number;
 
@@ -18,10 +18,6 @@ export class Sea extends DrawObject {
     this.baseYEnd = (this.canvas.height / 4) * 2;
     this.baseXRange = this.canvas.width / 2.5;
     this.baseYRange = this.canvas.width / 2.5;
-  }
-
-  update() {
-    this.frame++;
   }
 
   drawWaves() {
@@ -116,6 +112,44 @@ export class Sea extends DrawObject {
     this.ctx.restore();
   }
 
+  isPointInSea(x: number, y: number) {
+    const moveSpeed = 100 - 20;
+    const offset = 100 * Math.sin(this.frame / moveSpeed);
+
+    let waveX = this.baseStart;
+    let waveY = this.baseStart;
+    let waveIdx = 1;
+
+    this.ctx.beginPath();
+    this.ctx.moveTo(waveX, waveY);
+
+    while (waveY < this.canvas.height) {
+      const lc1 = {
+        x: waveIdx * this.baseXRange + offset,
+        y: waveY - offset,
+      };
+      const lc2 = {
+        x: waveX - offset,
+        y: waveIdx * this.baseYRange + offset,
+      };
+      const lp = {
+        x: waveIdx * this.baseXRange,
+        y: waveIdx * this.baseYRange,
+      };
+      this.ctx.bezierCurveTo(lc1.x, lc1.y, lc2.x, lc2.y, lp.x, lp.y);
+      this.ctx.lineTo(lp.x, lp.y);
+      waveX += this.baseXRange;
+      waveY += this.baseXRange;
+      waveIdx++;
+    }
+    this.ctx.lineTo(waveX, waveY);
+    this.ctx.lineTo(0, this.canvas.height);
+    this.ctx.lineTo(0, 0);
+    this.ctx.closePath();
+
+    return this.ctx.isPointInPath(x, y);
+  }
+
   drawSandyBeach() {
     let offsetS = 150;
     let sandX = this.baseStart + offsetS;
@@ -155,5 +189,9 @@ export class Sea extends DrawObject {
     this.ctx.stroke();
     this.ctx.fill();
     this.ctx.restore();
+  }
+
+  update() {
+    this.frame++;
   }
 }

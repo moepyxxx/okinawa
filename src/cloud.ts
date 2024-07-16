@@ -1,5 +1,5 @@
 import { DrawObject } from "./drawObject";
-import { Position } from "./type";
+import { Position, WeatherType } from "./type";
 
 export class Cloud extends DrawObject {
   frame: number = 0;
@@ -23,7 +23,7 @@ export class Cloud extends DrawObject {
     this.initialPhase = Math.random() * 2 * Math.PI;
   }
 
-  draw() {
+  draw(weather: WeatherType = "sunny") {
     // offsetの計算 (-10から10の間を行き来する)
     const amplitude = 10; // 振幅
     const frequency = 0.05; // 周波数 (値が小さいほど遅くなる)
@@ -42,8 +42,9 @@ export class Cloud extends DrawObject {
       this.cloudPosition.x + offset,
       this.cloudPosition.y,
       this.scale,
-      "#fafdff",
-      "#efefef"
+      `rgba(250, 253, 255, ${weather === "rainy" ? 0.9 : 0.5})`,
+      `rgba(239, 239, 239, ${weather === "rainy" ? 0.9 : 0.5})`,
+      "blur(1px)"
     );
   }
 

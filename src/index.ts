@@ -6,6 +6,7 @@ import { ContentImage } from "./image";
 import { Sea } from "./sea";
 import { Text } from "./text";
 import { Title } from "./title";
+import { Weather } from "./weather";
 
 let canvas: HTMLCanvasElement | null = null;
 let ctx: CanvasRenderingContext2D | null = null;
@@ -22,8 +23,8 @@ let footPrint: FootPrint | null = null;
 let bird: Bird | null = null;
 let title: Title | null = null;
 let text: Text | null = null;
-const clouds: Cloud[] = [];
 const contentImages: ContentImage[] = [];
+let weather: Weather | null = null;
 
 setup();
 animate(0);
@@ -66,50 +67,6 @@ function setup() {
     { text: "A", width: 150 },
   ]);
   text = new Text(canvas, ctx);
-  // cloud = new Cloud(canvas, ctx);
-  clouds.push(
-    ...[
-      new Cloud(
-        canvas,
-        ctx,
-        {
-          x: canvas.width - 200,
-          y: canvas.height / 2,
-        },
-        {
-          x: canvas.width - 200,
-          y: canvas.height / 2 + 300,
-        },
-        1
-      ),
-      new Cloud(
-        canvas,
-        ctx,
-        {
-          x: -300,
-          y: -200,
-        },
-        {
-          x: -300,
-          y: -200 + 150,
-        },
-        0.6
-      ),
-      new Cloud(
-        canvas,
-        ctx,
-        {
-          x: canvas.width / 5,
-          y: (canvas.height / 7) * 6.5,
-        },
-        {
-          x: canvas.width / 5,
-          y: (canvas.height / 7) * 6.5 + 150,
-        },
-        0.9
-      ),
-    ]
-  );
 
   const imageWidth = (canvas.width - 200 - 40 * 3) / 3;
   const imageHeight = imageWidth * (2 / 3);
@@ -192,6 +149,8 @@ function setup() {
       ),
     ]
   );
+
+  weather = new Weather(canvas, ctx, sea);
 }
 
 function draw() {
@@ -204,6 +163,10 @@ function draw() {
   bubble?.draw();
   footPrint?.draw();
   bird?.draw();
+
+  weather?.draw();
+
+  // 以下が上に重ねたくないもの
   title?.drawSun();
   title?.drawTitle();
   text?.drawText(
@@ -217,7 +180,6 @@ function draw() {
     "#0068b7"
   );
   drawScrollDown();
-
   text?.drawText(
     "Contents",
     60,
@@ -242,10 +204,6 @@ function draw() {
   contentImages.forEach((contentImage) => {
     contentImage.draw();
   });
-  clouds.forEach((cloud) => {
-    cloud.draw();
-  });
-
   text?.drawText(
     "© 2024 iwa moe",
     14,
@@ -311,14 +269,13 @@ function drawScrollDown() {
 function update() {
   frame++;
   sea?.update();
+
   footPrint?.update();
   title?.update();
   contentImages.forEach((contentImage) => {
     contentImage.update();
   });
-  clouds.forEach((cloud) => {
-    cloud.update();
-  });
+  weather?.update();
 }
 
 function animate(timestamp: number) {
