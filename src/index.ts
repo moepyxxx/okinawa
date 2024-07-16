@@ -21,7 +21,7 @@ let contentsStartFrame: number = 0;
 let isPaging: boolean = false;
 let pagingStartFrame: number = 0;
 let currentContentPage: string | null = null;
-const pagingTotalFrames = 20;
+const pagingTotalFrames = 10;
 
 let currentContent: ImageContent | null = null;
 
@@ -146,8 +146,22 @@ function setup() {
           y: row2,
         },
         "Glass",
-        "",
-        [""]
+        "沖縄の自然みたいにきれいな琉球ガラスの世界",
+        [
+          "沖縄に行ったら絶対おみやげに欲しいと",
+          "思っていたのがこの琉球ガラス",
+          "",
+          "今回はとある工房さんをたずねて",
+          "吹きガラス体験をしてみました〜",
+          "",
+          "ガラスの素材を選ぶのにめちゃガチ悩み",
+          "",
+          "わたしは沖縄の海の中、",
+          "珊瑚礁をイメージしたカラフルな仕上がりに",
+          "",
+          "樽のようにずんぐりむっくりのグラスは",
+          "家で泡盛を飲むのにぴったりでした",
+        ]
       ),
       new ImageContent(
         canvas,
@@ -214,9 +228,7 @@ function draw() {
 
   // ページング終わり
   if (isPaging && frame - pagingStartFrame === pagingTotalFrames) {
-    if (container) {
-      container.style.height = currentContentPage === null ? "250vh" : "100vh";
-    }
+    window.scrollTo(0, 0);
     isPaging = false;
     if (container) {
       container.style.cursor = "default";

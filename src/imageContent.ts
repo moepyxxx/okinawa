@@ -164,7 +164,65 @@ export class ImageContent extends DrawObject {
   }
 
   drawSubContent() {
-    console.log("draw!!!");
+    if (!this.image) return;
+
+    // TOP画像
+    this.ctx.save();
+    this.ctx.drawImage(
+      this.image,
+      this.canvas.width / 3,
+      0,
+      (this.canvas.width / 3) * 2,
+      ((this.canvas.width / 3) * 2 * 2) / 3
+    );
+    this.ctx.restore();
+
+    // タイトル
+    this.ctx.save();
+    this.ctx.textAlign = "left";
+    this.ctx.textBaseline = "middle";
+    this.drawTextWithKerning(
+      this.title.split(""),
+      this.canvas.width / 10,
+      ((this.canvas.width / 3) * 2 * 2) / 3 / 2,
+      20,
+      "bold 132px Arial",
+      "#fff"
+    );
+    this.ctx.restore();
+
+    // サブタイトル
+    this.ctx.save();
+    this.drawTextWithKerning(
+      this.subTitle.split(""),
+      this.canvas.width / 10,
+      ((this.canvas.width / 3) * 2 * 2) / 3 / 2 + 100,
+      4,
+      "24px Arial",
+      "#fff"
+    );
+
+    this.ctx.restore();
+  }
+
+  drawTextWithKerning(
+    text: string[],
+    x: number,
+    y: number,
+    kerning: number,
+    font: string,
+    fillStyle: string
+  ) {
+    this.ctx.font = font;
+    this.ctx.fillStyle = fillStyle;
+    let currentX = x;
+    this.ctx.textAlign = "left";
+
+    for (let i = 0; i < text.length; i++) {
+      const char = text[i];
+      this.ctx.fillText(char, currentX, y);
+      currentX += this.ctx.measureText(char).width + kerning;
+    }
   }
 
   isPointInImage(x: number, y: number) {
