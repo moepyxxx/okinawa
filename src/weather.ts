@@ -7,7 +7,7 @@ import { SandyWaterDrop } from "./sandyWaterDrop";
 
 export class Weather extends DrawObject {
   frame: number = 0;
-  weather: WeatherType = "rainy";
+  weather: WeatherType = "sunny";
   isChanging: boolean = false;
   weatherFrame: number = 0;
   startChangeFrame: number = 0;

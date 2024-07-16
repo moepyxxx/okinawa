@@ -1,8 +1,7 @@
 import { Bird } from "./bird";
 import { Bubble } from "./bubble";
-import { Cloud } from "./cloud";
 import { FootPrint } from "./footPrint";
-import { ContentImage } from "./image";
+import { ImageContent } from "./imageContent";
 import { Sea } from "./sea";
 import { Text } from "./text";
 import { Title } from "./title";
@@ -10,12 +9,21 @@ import { Weather } from "./weather";
 
 let canvas: HTMLCanvasElement | null = null;
 let ctx: CanvasRenderingContext2D | null = null;
+let container: HTMLElement | null = null;
 
 let animationId: number | null;
 let lastTime: number = 0;
 let fps: number = 0;
 let interval: number = 0;
 let frame: number = 0;
+let contentsStartFrame: number = 0;
+
+let isPaging: boolean = false;
+let pagingStartFrame: number = 0;
+let currentContentPage: string | null = null;
+const pagingTotalFrames = 20;
+
+let currentContent: ImageContent | null = null;
 
 let sea: Sea | null = null;
 let bubble: Bubble | null = null;
@@ -23,7 +31,7 @@ let footPrint: FootPrint | null = null;
 let bird: Bird | null = null;
 let title: Title | null = null;
 let text: Text | null = null;
-const contentImages: ContentImage[] = [];
+const imageContents: ImageContent[] = [];
 let weather: Weather | null = null;
 
 setup();
@@ -42,7 +50,8 @@ function setup() {
 
   canvas = document.querySelector("canvas");
   ctx = canvas?.getContext("2d") ?? null;
-  if (canvas == null || ctx == null) {
+  container = document.querySelector(".container") as HTMLElement;
+  if (canvas == null || ctx == null || container == null) {
     throw new Error("cannot get canvas");
   }
 
@@ -73,87 +82,158 @@ function setup() {
   const row1 =
     canvas.height / 2 + (canvas.height / 2 - (40 + 2 * imageHeight)) / 2;
   const row2 = row1 + imageHeight + 40;
-  contentImages.push(
+  imageContents.push(
     ...[
-      new ContentImage(
+      new ImageContent(
         canvas,
         ctx,
         "./images/sea_creatures.jpeg",
+        [],
         {
           x: 100,
           y: row1,
         },
-        imageWidth,
-        imageHeight,
-        20
+        "Sea Creatures",
+        "",
+        [""]
       ),
-      new ContentImage(
+      new ImageContent(
         canvas,
         ctx,
         "./images/food.jpeg",
+        [],
         {
           x: canvas.width / 2 - imageWidth / 2,
           y: row1,
         },
-        imageWidth,
-        imageHeight,
-        20
+        "Food",
+        "",
+        [""]
       ),
-      new ContentImage(
+      new ImageContent(
         canvas,
         ctx,
         "./images/nature.jpeg",
+        [],
         {
           x: canvas.width - imageWidth - 100,
           y: row1,
         },
-        imageWidth,
-        imageHeight,
-        20
+        "Nature",
+        "",
+        [""]
       ),
-      new ContentImage(
+      new ImageContent(
         canvas,
         ctx,
         "./images/sea.jpeg",
+        [],
         {
           x: 100,
           y: row2,
         },
-        imageWidth,
-        imageHeight,
-        20
+        "Sea",
+        "",
+        [""]
       ),
-      new ContentImage(
+      new ImageContent(
         canvas,
         ctx,
         "./images/glass.jpeg",
+        [],
         {
           x: canvas.width / 2 - imageWidth / 2,
           y: row2,
         },
-        imageWidth,
-        imageHeight,
-        20
+        "Glass",
+        "",
+        [""]
       ),
-      new ContentImage(
+      new ImageContent(
         canvas,
         ctx,
         "./images/hotel.jpeg",
+        [],
         {
           x: canvas.width - imageWidth - 100,
           y: row2,
         },
-        imageWidth,
-        imageHeight,
-        20
+        "Hotel",
+        "",
+        [""]
       ),
     ]
   );
+  imageContents.forEach((contentImage) => {
+    window.addEventListener("click", (e) => {
+      const isClicked = contentImage.isPointInImage(e.offsetX, e.offsetY);
+      if (isClicked) {
+        currentContentPage = contentImage.title;
+        isPaging = true;
+        pagingStartFrame = frame;
+      }
+    });
+  });
+  window.addEventListener("mousemove", (e) => {
+    if (!container) return;
+
+    const isHovered = imageContents.some((content) =>
+      content.isPointInImage(e.offsetX, e.offsetY)
+    );
+    if (isHovered) {
+      container.style.cursor = "pointer";
+    } else {
+      container.style.cursor = "default";
+    }
+  });
 
   weather = new Weather(canvas, ctx, sea);
 }
 
 function draw() {
+  if (ctx == null) {
+    throw new Error("cannot get canvas");
+  }
+
+  if (!isPaging && currentContentPage === null) {
+    drawTop();
+  }
+
+  if (!isPaging && currentContentPage !== null) {
+    drawContentsBackground();
+    drawContents();
+  }
+
+  // ページング中
+  if (isPaging) {
+    currentContentPage === null ? drawContents() : drawTop();
+
+    const progress = (frame - pagingStartFrame) / pagingTotalFrames;
+    drawContentsBackground(progress);
+  }
+
+  // ページング終わり
+  if (isPaging && frame - pagingStartFrame === pagingTotalFrames) {
+    if (container) {
+      container.style.height = currentContentPage === null ? "250vh" : "100vh";
+    }
+    isPaging = false;
+    if (container) {
+      container.style.cursor = "default";
+    }
+
+    // コンテンツフレームを初期化
+    currentContentPage === null
+      ? (contentsStartFrame = 0)
+      : contentsStartFrame === frame;
+  }
+}
+
+function drawTop() {
+  if (ctx == null) {
+    throw new Error("cannot get canvas");
+  }
+
   const canvasWidth = canvas?.width ?? 0;
   const canvasHeight = canvas?.height ?? 0;
 
@@ -189,8 +269,8 @@ function draw() {
     "bold",
     "#fff"
   );
-  contentImages.forEach((contentImage) => {
-    contentImage.draw();
+  imageContents.forEach((contentImage) => {
+    contentImage.drawTopContents();
   });
   text?.drawText(
     "気になる画像をクリックしてみてください",
@@ -201,9 +281,6 @@ function draw() {
     "",
     "#fff"
   );
-  contentImages.forEach((contentImage) => {
-    contentImage.draw();
-  });
   text?.drawText(
     "© 2024 iwa moe",
     14,
@@ -213,6 +290,29 @@ function draw() {
     "",
     "#abb1b5"
   );
+}
+
+function drawContentsBackground(progress: number = 1) {
+  if (ctx == null) {
+    throw new Error("cannot get canvas");
+  }
+
+  const canvasWidth = canvas?.width ?? 0;
+  const canvasHeight = canvas?.height ?? 0;
+
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(0, 0, canvasWidth, canvasHeight);
+  ctx.fillStyle = `rgba(0, 175, 204, ${progress})`;
+  ctx.fill();
+  ctx.restore();
+}
+
+function drawContents() {
+  if (!currentContent) {
+    throw new Error("cannot get currentContent");
+  }
+  currentContent.drawSubContents();
 }
 
 function drawScrollDown() {
@@ -267,15 +367,32 @@ function drawScrollDown() {
 }
 
 function update() {
+  if (canvas == null || ctx == null) {
+    throw new Error("cannot get canvas");
+  }
+
+  // コンテンツがある場合は準備
+  if (currentContentPage !== null && currentContent === null) {
+    const contentImage = imageContents.find(
+      (content) => content.title === currentContentPage
+    );
+    if (!contentImage || !contentImage.image) {
+      throw new Error("cannot get title");
+    }
+    currentContent = contentImage;
+  }
+
+  // 各インスタンスの更新
   frame++;
   sea?.update();
 
   footPrint?.update();
   title?.update();
-  contentImages.forEach((contentImage) => {
+  imageContents.forEach((contentImage) => {
     contentImage.update();
   });
   weather?.update();
+  currentContent?.update();
 }
 
 function animate(timestamp: number) {
