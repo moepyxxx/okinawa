@@ -52,7 +52,7 @@ export class ImageContent extends DrawObject {
     });
   }
 
-  drawTopContents() {
+  drawTopContent() {
     if (!this.image) return;
 
     // offsetの計算 (-15から15の間を行き来する)
@@ -163,7 +163,7 @@ export class ImageContent extends DrawObject {
     this.ctx.restore();
   }
 
-  drawSubContents() {
+  drawSubContent() {
     console.log("draw!!!");
   }
 

@@ -270,7 +270,7 @@ function drawTop() {
     "#fff"
   );
   imageContents.forEach((contentImage) => {
-    contentImage.drawTopContents();
+    contentImage.drawTopContent();
   });
   text?.drawText(
     "気になる画像をクリックしてみてください",
@@ -312,7 +312,7 @@ function drawContents() {
   if (!currentContent) {
     throw new Error("cannot get currentContent");
   }
-  currentContent.drawSubContents();
+  currentContent.drawSubContent();
 }
 
 function drawScrollDown() {
