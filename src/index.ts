@@ -12,16 +12,12 @@ let ctx: CanvasRenderingContext2D | null = null;
 let container: HTMLElement | null = null;
 
 let animationId: number | null;
-let lastTime: number = 0;
-let fps: number = 0;
-let interval: number = 0;
 let frame: number = 0;
-let contentsStartFrame: number = 0;
 
 let isPaging: boolean = false;
 let pagingStartFrame: number = 0;
 let currentContentPage: string | null = null;
-const pagingTotalFrames = 10;
+const pagingTotalFrames = 100;
 
 let currentContent: ImageContent | null = null;
 
@@ -35,18 +31,15 @@ const imageContents: ImageContent[] = [];
 let weather: Weather | null = null;
 
 setup();
-animate(0);
+animate();
 
 window.addEventListener("resize", () => {
   setup();
-  draw();
+  animate();
 });
 
 function setup() {
   animationId = null;
-  lastTime = 0;
-  fps = 10;
-  interval = 1000 / fps;
 
   canvas = document.querySelector("canvas");
   ctx = canvas?.getContext("2d") ?? null;
@@ -140,7 +133,7 @@ function setup() {
         canvas,
         ctx,
         "./images/glass.jpeg",
-        [],
+        ["./images/glass.jpeg", "./images/glass.jpeg"],
         {
           x: canvas.width / 2 - imageWidth / 2,
           y: row2,
@@ -214,30 +207,41 @@ function draw() {
   }
 
   if (!isPaging && currentContentPage !== null) {
-    drawContentsBackground();
-    drawContents();
+    drawContentBackground();
+    drawContent();
   }
 
   // ページング中
   if (isPaging) {
-    currentContentPage === null ? drawContents() : drawTop();
+    if (currentContentPage !== null) {
+      drawTop();
+    } else {
+      drawContentBackground();
+      drawContent();
+    }
 
     const progress = (frame - pagingStartFrame) / pagingTotalFrames;
-    drawContentsBackground(progress);
+    drawContentBackground(progress);
   }
 
   // ページング終わり
   if (isPaging && frame - pagingStartFrame === pagingTotalFrames) {
     window.scrollTo(0, 0);
+    if (container && canvas) {
+      container.style.height = currentContentPage === null ? "250vh" : "160vh";
+      canvas.height =
+        currentContentPage === null
+          ? window.innerHeight * 2.5
+          : window.innerHeight * 1.6;
+    }
     isPaging = false;
     if (container) {
       container.style.cursor = "default";
     }
 
-    // コンテンツフレームを初期化
-    currentContentPage === null
-      ? (contentsStartFrame = 0)
-      : contentsStartFrame === frame;
+    if (currentContentPage === null) {
+      currentContent = null;
+    }
   }
 }
 
@@ -304,7 +308,7 @@ function drawTop() {
   );
 }
 
-function drawContentsBackground(progress: number = 1) {
+function drawContentBackground(progress: number = 1) {
   if (ctx == null) {
     throw new Error("cannot get canvas");
   }
@@ -320,11 +324,11 @@ function drawContentsBackground(progress: number = 1) {
   ctx.restore();
 }
 
-function drawContents() {
+function drawContent() {
   if (!currentContent) {
     throw new Error("cannot get currentContent");
   }
-  currentContent.drawSubContent();
+  currentContent.drawContent();
 }
 
 function drawScrollDown() {
@@ -392,6 +396,18 @@ function update() {
       throw new Error("cannot get title");
     }
     currentContent = contentImage;
+    currentContent.setCurrentContent();
+  }
+  // コンテンツがあるが表示が終わっている場合
+  if (
+    currentContentPage !== null &&
+    currentContent !== null &&
+    currentContent.isCurrentImageContent === false
+  ) {
+    currentContent.removeCurrentContent();
+    currentContentPage = null;
+    isPaging = true;
+    pagingStartFrame = frame;
   }
 
   // 各インスタンスの更新
@@ -407,15 +423,13 @@ function update() {
   currentContent?.update();
 }
 
-function animate(timestamp: number) {
+function animate() {
   if (canvas == null || ctx == null) {
     throw new Error("cannot get canvas");
   }
-  if (timestamp - lastTime > interval) {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    draw();
-    update();
-    lastTime = timestamp;
-  }
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  draw();
+  update();
+
   animationId = requestAnimationFrame(animate);
 }

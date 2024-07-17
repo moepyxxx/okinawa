@@ -4,6 +4,7 @@ import { Position } from "./type";
 export class ImageContent extends DrawObject {
   frame: number = 0;
   image: HTMLImageElement | null = null;
+  isCurrentImageContent: boolean = false;
   subImages: HTMLImageElement[] = [];
   title: string;
   subTitle: string;
@@ -163,8 +164,74 @@ export class ImageContent extends DrawObject {
     this.ctx.restore();
   }
 
-  drawSubContent() {
+  clickListener = (e: MouseEvent) => {
+    const offset = 8;
+    this.ctx.beginPath();
+    this.ctx.rect(
+      this.canvas.width / 10 - offset,
+      this.canvas.height / 40 - offset,
+      (this.canvas.width / 10) * 1.2 + offset * 2,
+      16 + offset * 2
+    );
+    this.ctx.closePath();
+
+    if (this.ctx.isPointInPath(e.offsetX, e.offsetY)) {
+      this.isCurrentImageContent = false;
+    }
+  };
+
+  mouseMoveListener = (e: MouseEvent) => {
+    const offset = 8;
+    this.ctx.beginPath();
+    this.ctx.rect(
+      this.canvas.width / 10 - offset,
+      this.canvas.height / 40 - offset,
+      (this.canvas.width / 10) * 1.2 + offset * 2,
+      16 + offset * 2
+    );
+    this.ctx.closePath();
+
+    if (this.ctx.isPointInPath(e.offsetX, e.offsetY)) {
+      this.canvas.style.cursor = "pointer";
+    } else {
+      this.canvas.style.cursor = "default";
+    }
+  };
+
+  setCurrentContent() {
+    this.isCurrentImageContent = true;
+    window.addEventListener("click", this.clickListener);
+    window.addEventListener("mousemove", this.mouseMoveListener);
+  }
+
+  removeCurrentContent() {
+    this.isCurrentImageContent = false;
+    window.removeEventListener("click", this.clickListener);
+    window.removeEventListener("mousemove", this.mouseMoveListener);
+  }
+
+  drawContent() {
     if (!this.image) return;
+
+    // 戻るページ
+    this.ctx.save();
+    this.ctx.textAlign = "left";
+    this.ctx.textBaseline = "top";
+    this.drawTextWithKerning(
+      "← Back To Top Page".split(""),
+      this.canvas.width / 10,
+      this.canvas.height / 40,
+      2,
+      "16px Arial",
+      "#fff"
+    );
+    this.ctx.restore();
+
+    const topImageWidth = (this.canvas.width / 3) * 2;
+    const topImageHeight = ((this.canvas.width / 3) * 2 * 2) / 3;
+
+    const subImageWidth = (this.canvas.width / 6) * 2;
+    const subImageHeight = ((this.canvas.width / 6) * 2 * 2) / 3;
 
     // TOP画像
     this.ctx.save();
@@ -172,8 +239,8 @@ export class ImageContent extends DrawObject {
       this.image,
       this.canvas.width / 3,
       0,
-      (this.canvas.width / 3) * 2,
-      ((this.canvas.width / 3) * 2 * 2) / 3
+      topImageWidth,
+      topImageHeight
     );
     this.ctx.restore();
 
@@ -184,7 +251,7 @@ export class ImageContent extends DrawObject {
     this.drawTextWithKerning(
       this.title.split(""),
       this.canvas.width / 10,
-      ((this.canvas.width / 3) * 2 * 2) / 3 / 2,
+      topImageHeight / 2,
       20,
       "bold 132px Arial",
       "#fff"
@@ -196,12 +263,52 @@ export class ImageContent extends DrawObject {
     this.drawTextWithKerning(
       this.subTitle.split(""),
       this.canvas.width / 10,
-      ((this.canvas.width / 3) * 2 * 2) / 3 / 2 + 100,
+      topImageHeight / 2 + 100,
       4,
       "24px Arial",
       "#fff"
     );
+    this.ctx.restore();
 
+    // 本文
+    this.ctx.save();
+    this.ctx.textAlign = "left";
+    this.ctx.textBaseline = "top";
+    this.bodies.forEach((body, i) => {
+      this.drawTextWithKerning(
+        body.split(""),
+        (this.canvas.width / 10) * 6,
+        topImageHeight + this.canvas.height / 10 + subImageHeight / 2 + 32 * i,
+        4,
+        "16px Arial",
+        "#fff"
+      );
+    });
+    this.ctx.restore();
+
+    // サブ画像
+    if (this.subImages.length !== 2) {
+      throw new Error("subImages length is not 2");
+    }
+
+    this.ctx.save();
+    this.ctx.drawImage(
+      this.subImages[0],
+      0,
+      topImageHeight + this.canvas.height / 10,
+      subImageWidth,
+      subImageHeight
+    );
+    this.ctx.drawImage(
+      this.subImages[1],
+      this.canvas.width / 6,
+      topImageHeight +
+        this.canvas.height / 10 +
+        subImageHeight +
+        this.canvas.height / 20,
+      subImageWidth,
+      subImageHeight
+    );
     this.ctx.restore();
   }
 
