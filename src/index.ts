@@ -17,7 +17,7 @@ let frame: number = 0;
 let isPaging: boolean = false;
 let pagingStartFrame: number = 0;
 let currentContentPage: string | null = null;
-const pagingTotalFrames = 100;
+const pagingTotalFrames = 50;
 
 let currentContent: ImageContent | null = null;
 
@@ -27,7 +27,7 @@ let footPrint: FootPrint | null = null;
 let bird: Bird | null = null;
 let title: Title | null = null;
 let text: Text | null = null;
-const imageContents: ImageContent[] = [];
+let imageContents: ImageContent[] = [];
 let weather: Weather | null = null;
 
 setup();
@@ -75,20 +75,41 @@ function setup() {
   const row1 =
     canvas.height / 2 + (canvas.height / 2 - (40 + 2 * imageHeight)) / 2;
   const row2 = row1 + imageHeight + 40;
+  // 画像の初期化
+  imageContents.forEach((contentImage) => {
+    contentImage.removeCurrentContent();
+  });
+  imageContents = [];
   imageContents.push(
     ...[
       new ImageContent(
         canvas,
         ctx,
         "./images/sea_creatures.jpeg",
-        [],
+        ["./images/sea_creatures.jpeg", "./images/sea_creatures.jpeg"],
         {
           x: 100,
           y: row1,
         },
         "Sea Creatures",
-        "",
-        [""]
+        "沖縄の海にまったり住むカラフルで可愛いお魚たち",
+        [
+          "このクマノミとは、本部エリアから船で15分の場所に位置する",
+          "水納島（みんなじま）で会いました",
+          "",
+          "沖縄の海はどこもかしこも天然の水族館",
+          "砂浜から数メートルの遊泳エリアも海の中をのぞいてみれば魚たちが",
+          "",
+          "特に驚いたのはその近さ。近いって",
+          "君たちは警戒心がないのかな？というくらい",
+          "スレスレを通りかかります（追いかけたり触ったりしたらダメです）",
+          "",
+          "魚たちはたぶんそこが家なので家にいるだけですが",
+          "私のこと好きなのかなと勘違いするくらいでした",
+          "",
+          "とにかくめちゃくちゃ可愛いー！",
+          "（沖縄には毒のある魚もいるので、注意が必要みたいです）",
+        ]
       ),
       new ImageContent(
         canvas,
@@ -225,7 +246,7 @@ function draw() {
   }
 
   // ページング終わり
-  if (isPaging && frame - pagingStartFrame === pagingTotalFrames) {
+  if (isPaging && frame - pagingStartFrame === pagingTotalFrames + 30) {
     window.scrollTo(0, 0);
     if (container && canvas) {
       container.style.height = currentContentPage === null ? "250vh" : "160vh";
@@ -262,6 +283,10 @@ function drawTop() {
 
   weather?.draw();
 
+  imageContents.forEach((contentImage) => {
+    contentImage.drawTopContent();
+  });
+
   // 以下が上に重ねたくないもの
   title?.drawSun();
   title?.drawTitle();
@@ -285,9 +310,6 @@ function drawTop() {
     "bold",
     "#fff"
   );
-  imageContents.forEach((contentImage) => {
-    contentImage.drawTopContent();
-  });
   text?.drawText(
     "気になる画像をクリックしてみてください",
     20,
@@ -328,7 +350,7 @@ function drawContent() {
   if (!currentContent) {
     throw new Error("cannot get currentContent");
   }
-  currentContent.drawContent();
+  currentContent.drawContent(pagingStartFrame);
 }
 
 function drawScrollDown() {
@@ -420,7 +442,8 @@ function update() {
     contentImage.update();
   });
   weather?.update();
-  currentContent?.update();
+  // imageContents.forEachのupdateと重複する
+  // currentContent?.update();
 }
 
 function animate() {

@@ -9,6 +9,7 @@ export class ImageContent extends DrawObject {
   title: string;
   subTitle: string;
   bodies: string[];
+  bodiesCount: number;
   contentsPosition: Position = { x: 0, y: 0 };
 
   topImageWidth: number;
@@ -38,6 +39,9 @@ export class ImageContent extends DrawObject {
     this.title = title;
     this.subTitle = subTitle;
     this.bodies = bodies;
+    this.bodiesCount = bodies
+      .map((body) => body.length)
+      .reduce((a, b) => a + b);
 
     this.topImageWidth = (canvas.width - 200 - 40 * 3) / 3;
     this.topImageHeight = this.topImageWidth * (2 / 3);
@@ -210,7 +214,7 @@ export class ImageContent extends DrawObject {
     window.removeEventListener("mousemove", this.mouseMoveListener);
   }
 
-  drawContent() {
+  drawContent(elapsedFrame: number) {
     if (!this.image) return;
 
     // 戻るページ
@@ -233,11 +237,25 @@ export class ImageContent extends DrawObject {
     const subImageWidth = (this.canvas.width / 6) * 2;
     const subImageHeight = ((this.canvas.width / 6) * 2 * 2) / 3;
 
+    const totalFrames = 20;
+    // 80フレーム後には完全に表示されるのでその待ち時間
+    const offsetFrames = 80;
+    const progress = this.isCurrentImageContent
+      ? (this.frame - elapsedFrame - offsetFrames) / totalFrames
+      : 1;
+
+    const topImageProgressWidth =
+      progress < 1
+        ? this.canvas.width / 3 +
+          100 +
+          (this.canvas.width / 3 - (this.canvas.width / 3 + 100)) * progress
+        : this.canvas.width / 3;
     // TOP画像
     this.ctx.save();
+    this.ctx.globalAlpha = progress;
     this.ctx.drawImage(
       this.image,
-      this.canvas.width / 3,
+      topImageProgressWidth,
       0,
       topImageWidth,
       topImageHeight
@@ -248,6 +266,7 @@ export class ImageContent extends DrawObject {
     this.ctx.save();
     this.ctx.textAlign = "left";
     this.ctx.textBaseline = "middle";
+    this.ctx.globalAlpha = progress;
     this.drawTextWithKerning(
       this.title.split(""),
       this.canvas.width / 10,
@@ -266,24 +285,57 @@ export class ImageContent extends DrawObject {
       topImageHeight / 2 + 100,
       4,
       "24px Arial",
-      "#fff"
+      `rgba(255, 255, 255, ${progress})`
     );
     this.ctx.restore();
 
     // 本文
+    const bodyTotalFrames = 100;
+    const bodyProgress = this.isCurrentImageContent
+      ? (this.frame - elapsedFrame - offsetFrames) / bodyTotalFrames
+      : 1;
+
+    const bodyProgressCount =
+      bodyProgress < 1
+        ? Math.ceil(this.bodiesCount * bodyProgress)
+        : this.bodiesCount;
+    let totalBodyCount = 0;
+    let bodyIndex = 0;
+    let bodyCount = 0;
+    for (let i = 0; i < this.bodies.length; i++) {
+      if (totalBodyCount + this.bodies[i].length >= bodyProgressCount) {
+        bodyIndex = i;
+        bodyCount = bodyProgressCount - totalBodyCount;
+        break;
+      }
+      totalBodyCount += this.bodies[i].length;
+    }
     this.ctx.save();
     this.ctx.textAlign = "left";
     this.ctx.textBaseline = "top";
     this.bodies.forEach((body, i) => {
       this.drawTextWithKerning(
         body.split(""),
-        (this.canvas.width / 10) * 6,
+        (this.canvas.width / 10) * 5,
         topImageHeight + this.canvas.height / 10 + subImageHeight / 2 + 32 * i,
         4,
         "16px Arial",
-        "#fff"
+        "rgba(255, 255, 255, 0.5)"
       );
     });
+    const opacity = 0.5 + (1 - 0.5) * bodyProgress;
+    for (let i = 0; i <= bodyIndex; i++) {
+      this.drawTextWithKerning(
+        i === bodyIndex
+          ? this.bodies[i].split("").slice(0, bodyCount)
+          : this.bodies[i].split(""),
+        (this.canvas.width / 10) * 5,
+        topImageHeight + this.canvas.height / 10 + subImageHeight / 2 + 32 * i,
+        4,
+        "16px Arial",
+        `rgba(255, 255, 255, ${opacity})`
+      );
+    }
     this.ctx.restore();
 
     // サブ画像
@@ -292,6 +344,7 @@ export class ImageContent extends DrawObject {
     }
 
     this.ctx.save();
+    this.ctx.globalAlpha = progress;
     this.ctx.drawImage(
       this.subImages[0],
       0,
@@ -301,7 +354,7 @@ export class ImageContent extends DrawObject {
     );
     this.ctx.drawImage(
       this.subImages[1],
-      this.canvas.width / 6,
+      this.canvas.width / 8,
       topImageHeight +
         this.canvas.height / 10 +
         subImageHeight +
@@ -318,7 +371,8 @@ export class ImageContent extends DrawObject {
     y: number,
     kerning: number,
     font: string,
-    fillStyle: string
+    fillStyle: string,
+    progress: number = 1
   ) {
     this.ctx.font = font;
     this.ctx.fillStyle = fillStyle;
