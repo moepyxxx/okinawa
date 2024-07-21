@@ -84,7 +84,7 @@ export class Weather extends DrawObject {
       this.weather === "rainy" &&
       (this.frame - this.weatherFrame) % 10 === 0
     ) {
-      for (let i = 0; i < 3; i++) {
+      for (let i = 0; i < 10; i++) {
         let randomX = Math.floor(Math.random() * this.canvas.width);
         let randomY = Math.floor(Math.random() * this.canvas.height);
         while (!this.sea.isPointInSea(randomX, randomY)) {
@@ -98,7 +98,7 @@ export class Weather extends DrawObject {
           })
         );
       }
-      for (let i = 0; i < 10; i++) {
+      for (let i = 0; i < 15; i++) {
         let randomX = Math.floor(Math.random() * this.canvas.width);
         let randomY = Math.floor(Math.random() * this.canvas.height);
         while (this.sea.isPointInSea(randomX, randomY)) {
