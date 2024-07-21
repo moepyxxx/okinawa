@@ -49,7 +49,10 @@ function setup() {
   }
 
   canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight * 2.5;
+  canvas.height = window.innerWidth * 1.5;
+  console.log(canvas.width);
+  console.log(canvas.height);
+  container.style.height = `${window.innerWidth * 1.5}px`;
   canvas.style.backgroundColor = "#fdf5e6";
   ctx.fillStyle = "#fff";
   ctx.strokeStyle = "#fff";
@@ -319,11 +322,14 @@ function draw() {
   if (isPaging && frame - pagingStartFrame === pagingTotalFrames + 30) {
     window.scrollTo(0, 0);
     if (container && canvas) {
-      container.style.height = currentContentPage === null ? "250vh" : "160vh";
+      container.style.height =
+        currentContentPage === null
+          ? `${window.innerWidth * 1.5}px`
+          : `${window.innerWidth * 1.3}px`;
       canvas.height =
         currentContentPage === null
-          ? window.innerHeight * 2.5
-          : window.innerHeight * 1.6;
+          ? window.innerWidth * 1.5
+          : window.innerWidth * 1.3;
     }
     isPaging = false;
     if (container) {
@@ -430,6 +436,7 @@ function drawScrollDown() {
 
   const canvasWidth = canvas.width;
   const canvasHeight = canvas.height;
+  const windowHeight = window.innerHeight;
 
   ctx.save();
   ctx.beginPath();
@@ -437,11 +444,11 @@ function drawScrollDown() {
   ctx.strokeStyle = "#fff";
 
   const startX = canvasWidth / 2;
-  const startY = (canvasHeight / 5) * 2 - 160;
+  const startY = windowHeight - 130;
 
-  const midY = (canvasHeight / 5) * 2 - 80;
+  const midY = windowHeight - 130 + 80;
   const endX = canvas.width / 2 + 20;
-  const endY = (canvasHeight / 5) * 2 - 100;
+  const endY = windowHeight - 130 + 60;
 
   ctx.moveTo(startX, startY);
 
@@ -467,7 +474,7 @@ function drawScrollDown() {
     "scroll down",
     20,
     canvasWidth / 2,
-    (canvasHeight / 5) * 2 - 50,
+    windowHeight - 20,
     "center",
     "",
     "#fff"
