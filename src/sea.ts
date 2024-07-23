@@ -2,20 +2,23 @@ import { DrawObject } from "./drawObject";
 
 export class Sea extends DrawObject {
   baseMiddle: number;
+  baseXStart: number;
+  baseYStart: number;
   baseEnd: number;
   baseYEnd: number;
 
   frame = 0;
-  baseStart = 0;
   baseXRange: number;
   baseYRange: number;
 
   constructor(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D) {
     super(canvas, ctx);
 
+    this.baseXStart = -(this.canvas.width / 6);
+    this.baseYStart = this.canvas.width / 5;
     this.baseMiddle = this.canvas.width / 2;
     this.baseEnd = this.canvas.width;
-    this.baseYEnd = (this.canvas.height / 4) * 2;
+    this.baseYEnd = (this.canvas.height / 4) * 2 + this.baseYStart;
     this.baseXRange = this.canvas.width / 2.5;
     this.baseYRange = this.canvas.width / 2.5;
   }
@@ -32,27 +35,28 @@ export class Sea extends DrawObject {
       const moveSpeed = moveRange - 20;
       const offset = moveRange * Math.sin(this.frame / moveSpeed);
 
-      let waveX = this.baseStart;
-      let waveY = this.baseStart;
+      let waveX = 0;
+      let waveY = 0;
       let waveIdx = 1;
 
       this.ctx.save();
       this.ctx.beginPath();
-      this.ctx.moveTo(waveX, waveY);
+      this.ctx.moveTo(this.baseXStart, this.baseYStart);
 
       while (waveY < this.canvas.height) {
         const lc1 = {
-          x: waveIdx * this.baseXRange + offset,
-          y: waveY - offset,
+          x: this.baseXStart + (waveIdx * this.baseXRange + offset),
+          y: this.baseYStart + (waveY - offset),
         };
         const lc2 = {
-          x: waveX - offset,
-          y: waveIdx * this.baseYRange + offset,
+          x: this.baseXStart + (waveX - offset),
+          y: this.baseYStart + (waveIdx * this.baseYRange + offset),
         };
         const lp = {
-          x: waveIdx * this.baseXRange,
-          y: waveIdx * this.baseYRange,
+          x: this.baseXStart + waveIdx * this.baseXRange,
+          y: this.baseYStart + waveIdx * this.baseYRange,
         };
+        console.log(lc1, lc2, lp, "wave");
         this.ctx.bezierCurveTo(lc1.x, lc1.y, lc2.x, lc2.y, lp.x, lp.y);
         this.ctx.lineTo(lp.x, lp.y);
         waveX += this.baseXRange;
@@ -61,7 +65,7 @@ export class Sea extends DrawObject {
       }
       this.ctx.lineTo(waveX, waveY);
       this.ctx.lineTo(0, this.canvas.height);
-      this.ctx.lineTo(0, 0);
+      this.ctx.lineTo(0, this.baseYStart);
       this.ctx.closePath();
       this.ctx.strokeStyle = "rgba(0, 175,204, .5)";
       this.ctx.fillStyle = "rgba(0, 175,204, .2)";
@@ -73,26 +77,26 @@ export class Sea extends DrawObject {
 
   drawSea() {
     let offsetF = -100;
-    let seaX = this.baseStart + offsetF;
-    let seaY = this.baseStart - offsetF;
+    let seaX = 0 + offsetF;
+    let seaY = 0 - offsetF;
     let seaIdx = 1;
 
     this.ctx.save();
     this.ctx.beginPath();
-    this.ctx.moveTo(seaX, seaY);
+    this.ctx.moveTo(this.baseXStart + offsetF, this.baseYStart - offsetF);
 
     while (seaY < this.canvas.height + offsetF) {
       const lc1 = {
-        x: seaIdx * this.baseXRange + offsetF,
-        y: seaY - offsetF,
+        x: this.baseXStart + (seaIdx * this.baseXRange + offsetF),
+        y: this.baseYStart + (seaY - offsetF),
       };
       const lc2 = {
-        x: seaX + offsetF,
-        y: seaIdx * this.baseYRange - offsetF,
+        x: this.baseXStart + (seaX + offsetF),
+        y: this.baseYStart + (seaIdx * this.baseYRange - offsetF),
       };
       const lp = {
-        x: seaIdx * this.baseXRange + offsetF,
-        y: seaIdx * this.baseYRange - offsetF,
+        x: this.baseXStart + (seaIdx * this.baseXRange + offsetF),
+        y: this.baseYStart + (seaIdx * this.baseYRange - offsetF),
       };
       this.ctx.bezierCurveTo(lc1.x, lc1.y, lc2.x, lc2.y, lp.x, lp.y);
       this.ctx.lineTo(lp.x, lp.y);
@@ -102,7 +106,7 @@ export class Sea extends DrawObject {
     }
     this.ctx.lineTo(seaX, seaY);
     this.ctx.lineTo(0, this.canvas.height);
-    this.ctx.lineTo(0, 0);
+    this.ctx.lineTo(0, this.baseYStart);
     this.ctx.closePath();
     this.ctx.filter = "blur(3px)";
     this.ctx.strokeStyle = "#00afcc";
@@ -116,25 +120,25 @@ export class Sea extends DrawObject {
     const moveSpeed = 100 - 20;
     const offset = 100 * Math.sin(this.frame / moveSpeed);
 
-    let waveX = this.baseStart;
-    let waveY = this.baseStart;
+    let waveX = 0;
+    let waveY = 0;
     let waveIdx = 1;
 
     this.ctx.beginPath();
-    this.ctx.moveTo(waveX, waveY);
+    this.ctx.moveTo(this.baseXStart, this.baseYStart);
 
     while (waveY < this.canvas.height) {
       const lc1 = {
-        x: waveIdx * this.baseXRange + offset,
-        y: waveY - offset,
+        x: this.baseXStart + (waveIdx * this.baseXRange + offset),
+        y: this.baseYStart + (waveY - offset),
       };
       const lc2 = {
-        x: waveX - offset,
-        y: waveIdx * this.baseYRange + offset,
+        x: this.baseXStart + (waveX - offset),
+        y: this.baseYStart + (waveIdx * this.baseYRange + offset),
       };
       const lp = {
-        x: waveIdx * this.baseXRange,
-        y: waveIdx * this.baseYRange,
+        x: this.baseXStart + waveIdx * this.baseXRange,
+        y: this.baseYStart + waveIdx * this.baseYRange,
       };
       this.ctx.bezierCurveTo(lc1.x, lc1.y, lc2.x, lc2.y, lp.x, lp.y);
       this.ctx.lineTo(lp.x, lp.y);
@@ -144,7 +148,7 @@ export class Sea extends DrawObject {
     }
     this.ctx.lineTo(waveX, waveY);
     this.ctx.lineTo(0, this.canvas.height);
-    this.ctx.lineTo(0, 0);
+    this.ctx.lineTo(0, this.baseYStart);
     this.ctx.closePath();
 
     return this.ctx.isPointInPath(x, y);
@@ -152,26 +156,26 @@ export class Sea extends DrawObject {
 
   drawSandyBeach() {
     let offsetS = 150;
-    let sandX = this.baseStart + offsetS;
-    let sandY = this.baseStart - offsetS;
+    let sandX = 0 + offsetS;
+    let sandY = 0 - offsetS;
     let seaIdx = 1;
 
     this.ctx.save();
     this.ctx.beginPath();
-    this.ctx.moveTo(sandX, sandY);
+    this.ctx.moveTo(this.baseXStart + offsetS, this.baseYStart - offsetS);
 
     while (sandY < this.canvas.height + offsetS) {
       const lc1 = {
-        x: seaIdx * this.baseXRange + offsetS,
-        y: sandY - offsetS,
+        x: this.baseXStart + (seaIdx * this.baseXRange + offsetS),
+        y: this.baseYStart + (sandY - offsetS),
       };
       const lc2 = {
-        x: sandX + offsetS,
-        y: seaIdx * this.baseYRange - offsetS,
+        x: this.baseXStart + (sandX + offsetS),
+        y: this.baseYStart + (seaIdx * this.baseYRange - offsetS),
       };
       const lp = {
-        x: seaIdx * this.baseXRange + offsetS,
-        y: seaIdx * this.baseYRange - offsetS,
+        x: this.baseXStart + (seaIdx * this.baseXRange + offsetS),
+        y: this.baseYStart + (seaIdx * this.baseYRange - offsetS),
       };
       this.ctx.bezierCurveTo(lc1.x, lc1.y, lc2.x, lc2.y, lp.x, lp.y);
       this.ctx.lineTo(lp.x, lp.y);
@@ -181,7 +185,7 @@ export class Sea extends DrawObject {
     }
     this.ctx.lineTo(sandX, sandY);
     this.ctx.lineTo(0, this.canvas.height);
-    this.ctx.lineTo(0, 0);
+    this.ctx.lineTo(0, this.baseXStart);
     this.ctx.closePath();
     this.ctx.filter = "blur(2px)";
     this.ctx.strokeStyle = "#ffefd5";
