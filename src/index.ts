@@ -10,6 +10,7 @@ import { Weather } from "./weather";
 let canvas: HTMLCanvasElement | null = null;
 let ctx: CanvasRenderingContext2D | null = null;
 let container: HTMLElement | null = null;
+let titleHeight: number;
 
 let animationId: number | null;
 let frame: number = 0;
@@ -49,28 +50,39 @@ function setup() {
   }
 
   canvas.width = window.innerWidth;
-  canvas.height = window.innerWidth * 1.5;
-  console.log(canvas.width);
-  console.log(canvas.height);
-  container.style.height = `${window.innerWidth * 1.5}px`;
+  canvas.height =
+    window.innerHeight < window.innerWidth / 2
+      ? window.innerHeight * 4
+      : window.innerHeight * 2;
+  container.style.height = `${
+    window.innerHeight < window.innerWidth / 2
+      ? window.innerHeight * 4
+      : window.innerHeight * 2
+  }px`;
   canvas.style.backgroundColor = "#fdf5e6";
   ctx.fillStyle = "#fff";
   ctx.strokeStyle = "#fff";
+  titleHeight = canvas.height / 4;
 
   sea = new Sea(canvas, ctx);
   bubble = new Bubble(canvas, ctx);
   footPrint = new FootPrint(canvas, ctx);
   bird = new Bird(canvas, ctx);
 
-  title = new Title(canvas, ctx, [
-    { text: "O", width: 150 },
-    { text: "K", width: 140 },
-    { text: "I", width: 70 },
-    { text: "N", width: 130 },
-    { text: "A", width: 130 },
-    { text: "W", width: 160 },
-    { text: "A", width: 150 },
-  ]);
+  title = new Title(
+    canvas,
+    ctx,
+    [
+      { text: "O", width: 150 },
+      { text: "K", width: 140 },
+      { text: "I", width: 70 },
+      { text: "N", width: 130 },
+      { text: "A", width: 130 },
+      { text: "W", width: 160 },
+      { text: "A", width: 150 },
+    ],
+    titleHeight
+  );
   text = new Text(canvas, ctx);
 
   const imageWidth = (canvas.width - 200 - 40 * 3) / 3;
@@ -320,16 +332,23 @@ function draw() {
 
   // ページング終わり
   if (isPaging && frame - pagingStartFrame === pagingTotalFrames + 30) {
+    window.innerHeight < window.innerWidth / 2
+      ? window.innerHeight * 4
+      : window.innerHeight * 2;
+
+    const topHeight =
+      window.innerHeight < window.innerWidth / 2
+        ? window.innerHeight * 4
+        : window.innerHeight * 2;
+    const contentHeight =
+      window.innerHeight > (window.innerWidth / 3) * 2
+        ? window.innerHeight * 1.5
+        : window.innerHeight * 2;
     window.scrollTo(0, 0);
     if (container && canvas) {
       container.style.height =
-        currentContentPage === null
-          ? `${window.innerWidth * 1.5}px`
-          : `${window.innerWidth * 1.3}px`;
-      canvas.height =
-        currentContentPage === null
-          ? window.innerWidth * 1.5
-          : window.innerWidth * 1.3;
+        currentContentPage === null ? `${topHeight}px` : `${contentHeight}px`;
+      canvas.height = currentContentPage === null ? topHeight : contentHeight;
     }
     isPaging = false;
     if (container) {
@@ -370,7 +389,7 @@ function drawTop() {
     "／ いえーい！旅行の思い出と魅力をぎゅっとまとめてみました ＼",
     30,
     canvasWidth / 2,
-    window.innerHeight / 2 + 60,
+    titleHeight + 60,
     "center",
     "bold",
     "rgba(0, 175,204, .5)",
@@ -435,8 +454,7 @@ function drawScrollDown() {
   }
 
   const canvasWidth = canvas.width;
-  const canvasHeight = canvas.height;
-  const windowHeight = window.innerHeight;
+  const startHeight = titleHeight * 2 - 50;
 
   ctx.save();
   ctx.beginPath();
@@ -444,11 +462,11 @@ function drawScrollDown() {
   ctx.strokeStyle = "#fff";
 
   const startX = canvasWidth / 2;
-  const startY = windowHeight - 130;
+  const startY = startHeight - 130;
 
-  const midY = windowHeight - 130 + 80;
+  const midY = startHeight - 130 + 80;
   const endX = canvas.width / 2 + 20;
-  const endY = windowHeight - 130 + 60;
+  const endY = startHeight - 130 + 60;
 
   ctx.moveTo(startX, startY);
 
@@ -474,7 +492,7 @@ function drawScrollDown() {
     "scroll down",
     20,
     canvasWidth / 2,
-    windowHeight - 20,
+    startHeight - 20,
     "center",
     "",
     "#fff"
@@ -519,8 +537,6 @@ function update() {
     contentImage.update();
   });
   weather?.update();
-  // imageContents.forEachのupdateと重複する
-  // currentContent?.update();
 }
 
 function animate() {

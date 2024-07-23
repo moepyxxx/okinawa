@@ -7,7 +7,7 @@ type TitleType = {
 
 export class Title extends DrawObject {
   frame: number = 0;
-  titleHeight: number = window.innerHeight;
+  titleHeight: number;
   title: TitleType[];
 
   sumWidth: number = 0;
@@ -16,11 +16,13 @@ export class Title extends DrawObject {
   constructor(
     canvas: HTMLCanvasElement,
     ctx: CanvasRenderingContext2D,
-    title: TitleType[]
+    title: TitleType[],
+    titleHeight: number
   ) {
     super(canvas, ctx);
     this.title = title;
     this.setupTitle();
+    this.titleHeight = titleHeight;
   }
 
   setupTitle() {
@@ -34,9 +36,9 @@ export class Title extends DrawObject {
     this.ctx.save();
     const gradient = this.ctx.createLinearGradient(
       this.startX,
-      this.titleHeight / 2 - 75,
+      this.titleHeight - 75,
       this.startX + this.sumWidth,
-      this.titleHeight / 2 + 75
+      this.titleHeight + 75
     );
 
     // HSL色空間で色を生成
@@ -65,7 +67,7 @@ export class Title extends DrawObject {
       for (let j = 0; j < i; j++) {
         x += this.title[j].width;
       }
-      this.ctx.strokeText(this.title[i].text, x, this.titleHeight / 2);
+      this.ctx.strokeText(this.title[i].text, x, this.titleHeight);
     }
     this.ctx.restore();
   }
@@ -74,20 +76,14 @@ export class Title extends DrawObject {
     this.ctx.save();
     this.ctx.fillStyle = "rgba(0, 175,204, .5)";
     this.ctx.beginPath();
-    this.ctx.arc(
-      this.startX + 100,
-      this.titleHeight / 2 - 180,
-      50,
-      0,
-      Math.PI * 2
-    );
+    this.ctx.arc(this.startX + 100, this.titleHeight - 180, 50, 0, Math.PI * 2);
     this.ctx.closePath();
     this.ctx.fill();
 
     for (let degree = 0; degree < 360; degree += 15) {
       const { A, B } = this.getCoordinatesFromAngle(
         this.startX + 100,
-        this.titleHeight / 2 - 180,
+        this.titleHeight - 180,
         degree,
         70,
         degree === 0

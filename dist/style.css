@@ -13,6 +13,21 @@ canvas {
 }
 
 .container {
-  height: 250vh;
-  background-color: #00afcc;
+  display: none;
+}
+
+.alert {
+  margin: 50px auto;
+  text-align: center;
+}
+
+@media screen and (min-width: 1100px) {
+  .container {
+    display: block;
+    height: 250vh;
+    background-color: #00afcc;
+  }
+  .alert {
+    display: none;
+  }
 }
