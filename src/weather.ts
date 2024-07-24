@@ -120,14 +120,13 @@ export class Weather extends DrawObject {
   }
 
   draw() {
-    this.clouds.forEach((cloud) => cloud.draw());
-
     this.seaWaterDrops.forEach((waterDrop) => {
       waterDrop.draw();
     });
     this.sandyWaterDrops.forEach((waterDrop) => {
       waterDrop.draw();
     });
+    this.clouds.forEach((cloud) => cloud.draw());
 
     let color =
       this.weather === "sunny" ? "rgba(0, 0, 0, 0)" : "rgba(0, 0, 0, 0.2)";

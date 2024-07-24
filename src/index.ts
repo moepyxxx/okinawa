@@ -35,6 +35,9 @@ setup();
 animate();
 
 window.addEventListener("resize", () => {
+  if (animationId !== null) {
+    cancelAnimationFrame(animationId);
+  }
   setup();
   animate();
 });
@@ -378,10 +381,6 @@ function drawTop() {
 
   weather?.draw();
 
-  imageContents.forEach((contentImage) => {
-    contentImage.drawTopContent();
-  });
-
   // 以下が上に重ねたくないもの
   title?.drawSun();
   title?.drawTitle();
@@ -423,16 +422,18 @@ function drawTop() {
     "",
     "#abb1b5"
   );
+
+  imageContents.forEach((contentImage) => {
+    contentImage.drawTopContent();
+  });
 }
 
 function drawContentBackground(progress: number = 1) {
   if (ctx == null) {
     throw new Error("cannot get canvas");
   }
-
   const canvasWidth = canvas?.width ?? 0;
   const canvasHeight = canvas?.height ?? 0;
-
   ctx.save();
   ctx.beginPath();
   ctx.rect(0, 0, canvasWidth, canvasHeight);
