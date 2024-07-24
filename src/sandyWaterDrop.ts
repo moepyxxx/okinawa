@@ -49,7 +49,7 @@ export class SandyWaterDrop extends DrawObject {
       false
     );
     this.ctx.closePath();
-    this.ctx.fillStyle = "rgba(0, 0, 0, .05)";
+    this.ctx.fillStyle = "rgb(255, 239, 213, 1)";
     this.ctx.fill();
 
     this.ctx.restore();

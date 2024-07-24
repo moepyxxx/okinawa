@@ -101,7 +101,7 @@ export class Weather extends DrawObject {
       for (let i = 0; i < 15; i++) {
         let randomX = Math.floor(Math.random() * this.canvas.width);
         let randomY = Math.floor(Math.random() * this.canvas.height);
-        while (this.sea.isPointInSea(randomX, randomY)) {
+        while (!this.sea.isPointInSandyBeach(randomX, randomY)) {
           randomX = Math.floor(Math.random() * this.canvas.width);
           randomY = Math.floor(Math.random() * this.canvas.height);
         }
@@ -120,6 +120,15 @@ export class Weather extends DrawObject {
   }
 
   draw() {
+    this.clouds.forEach((cloud) => cloud.draw());
+
+    this.seaWaterDrops.forEach((waterDrop) => {
+      waterDrop.draw();
+    });
+    this.sandyWaterDrops.forEach((waterDrop) => {
+      waterDrop.draw();
+    });
+
     let color =
       this.weather === "sunny" ? "rgba(0, 0, 0, 0)" : "rgba(0, 0, 0, 0.2)";
     const totalFrames = 20;
@@ -143,14 +152,5 @@ export class Weather extends DrawObject {
     this.ctx.fillStyle = color;
     this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
     this.ctx.restore();
-
-    this.clouds.forEach((cloud) => cloud.draw());
-
-    this.seaWaterDrops.forEach((waterDrop) => {
-      waterDrop.draw();
-    });
-    this.sandyWaterDrops.forEach((waterDrop) => {
-      waterDrop.draw();
-    });
   }
 }
