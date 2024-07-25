@@ -1,3 +1,4 @@
+import { max } from "lodash-es";
 import { Bird } from "./bird";
 import { Bubble } from "./bubble";
 import { FootPrint } from "./footPrint";
@@ -17,6 +18,9 @@ let frame: number = 0;
 let lastTime: number;
 let fps: number;
 let interval: number;
+
+// トップページのcanvasの高さは計算で求める
+let topCanvasHeight: number;
 
 let isPaging: boolean = false;
 let pagingStartFrame: number = 0;
@@ -51,7 +55,7 @@ window.addEventListener("resize", () => {
 function setup() {
   animationId = null;
   lastTime = 0;
-  fps = 20;
+  fps = 50;
   interval = 1000 / fps;
 
   canvas = document.querySelector("canvas");
@@ -62,49 +66,25 @@ function setup() {
   }
 
   canvas.width = window.innerWidth;
-  canvas.height =
-    window.innerHeight < window.innerWidth / 2
-      ? window.innerHeight * 4
-      : window.innerHeight * 2.3;
-  container.style.height = `${
-    window.innerHeight < window.innerWidth / 2
-      ? window.innerHeight * 4
-      : window.innerHeight * 2.3
-  }px`;
   canvas.style.backgroundColor = "#fdf5e6";
   ctx.fillStyle = "#fff";
   ctx.strokeStyle = "#fff";
-  titleHeight =
-    window.innerHeight < window.innerWidth / 2
-      ? canvas.height / 4
-      : ((canvas.height / 2.3) * 1) / 2;
 
-  sea = new Sea(canvas, ctx);
-  bubble = new Bubble(canvas, ctx);
-  footPrint = new FootPrint(canvas, ctx);
-  bird = new Bird(canvas, ctx);
-
-  title = new Title(
-    canvas,
-    ctx,
-    [
-      { text: "O", width: 150 },
-      { text: "K", width: 140 },
-      { text: "I", width: 70 },
-      { text: "N", width: 130 },
-      { text: "A", width: 130 },
-      { text: "W", width: 160 },
-      { text: "A", width: 150 },
-    ],
-    titleHeight
-  );
-  text = new Text(canvas, ctx);
+  // innerHeightがあまりにも小さかったら引き延ばす
+  titleHeight = window.innerHeight / 2;
 
   const imageWidth = (canvas.width - 200 - 40 * 3) / 3;
   const imageHeight = imageWidth * (2 / 3);
-  const row1 =
-    canvas.height / 2 + (canvas.height / 2 - (40 + 2 * imageHeight)) / 2;
-  const row2 = row1 + imageHeight + 40;
+  const imageRowHeight1 = titleHeight * 2 + 220;
+  const imageRowHeight2 = imageRowHeight1 + imageHeight + 40;
+
+  // 画像の計算後にcanvasの高さを決定
+  const endOffset = 300;
+  const totalHeight = imageRowHeight2 + imageHeight + endOffset;
+  topCanvasHeight = totalHeight;
+  canvas.height = totalHeight;
+  container.style.height = `${totalHeight}px`;
+
   // 画像の初期化
   imageContents.forEach((contentImage) => {
     contentImage.removeCurrentContent();
@@ -119,7 +99,7 @@ function setup() {
         ["./images/sea_sub_1.jpeg", "./images/sea_sub_2.jpeg"],
         {
           x: 100,
-          y: row1,
+          y: imageRowHeight1,
         },
         "Sea",
         "沖縄の海にまったり住むカラフルで可愛いお魚たち",
@@ -152,7 +132,7 @@ function setup() {
         ["./images/food_sub_1.jpeg", "./images/food_sub_2.jpeg"],
         {
           x: canvas.width / 2 - imageWidth / 2,
-          y: row1,
+          y: imageRowHeight1,
         },
         "Food",
         "バラエティ豊か！美味しかった沖縄のお料理たち",
@@ -183,7 +163,7 @@ function setup() {
         ["./images/nature_sub_1.jpeg", "./images/nature_sub_2.jpeg"],
         {
           x: canvas.width - imageWidth - 100,
-          y: row1,
+          y: imageRowHeight1,
         },
         "Nature",
         "豊かな沖縄の自然にふれあい絶景を楽しめる",
@@ -211,7 +191,7 @@ function setup() {
         ["./images/sake_sub_1.jpeg", "./images/sake_sub_2.jpeg"],
         {
           x: 100,
-          y: row2,
+          y: imageRowHeight2,
         },
         "Sake",
         "美味しかった沖縄のお酒たち",
@@ -242,7 +222,7 @@ function setup() {
         ["./images/glass_sub_1.jpeg", "./images/glass_sub_2.jpeg"],
         {
           x: canvas.width / 2 - imageWidth / 2,
-          y: row2,
+          y: imageRowHeight2,
         },
         "Glass",
         "沖縄の自然みたいにきれいな琉球ガラスの世界",
@@ -269,7 +249,7 @@ function setup() {
         ["./images/hotel_sub_1.jpeg", "./images/hotel_sub_2.jpeg"],
         {
           x: canvas.width - imageWidth - 100,
-          y: row2,
+          y: imageRowHeight2,
         },
         "Hotel",
         "異国感ただよう超絶ほすすぎなリゾートホテル",
@@ -315,11 +295,31 @@ function setup() {
     }
   });
 
+  sea = new Sea(canvas, ctx);
+  bubble = new Bubble(canvas, ctx);
+  footPrint = new FootPrint(canvas, ctx);
+  bird = new Bird(canvas, ctx);
+
+  title = new Title(
+    canvas,
+    ctx,
+    [
+      { text: "O", width: 150 },
+      { text: "K", width: 140 },
+      { text: "I", width: 70 },
+      { text: "N", width: 130 },
+      { text: "A", width: 130 },
+      { text: "W", width: 160 },
+      { text: "A", width: 150 },
+    ],
+    titleHeight
+  );
+  text = new Text(canvas, ctx);
   weather = new Weather(canvas, ctx, sea);
 }
 
 function draw() {
-  if (ctx == null || canvas == null) {
+  if (ctx == null || canvas == null || container == null) {
     throw new Error("cannot get canvas");
   }
 
@@ -348,6 +348,12 @@ function draw() {
 
   // ページング終わり
   if (isPaging && frame - pagingStartFrame === pagingTotalFrames + 30) {
+    // カーソルをデフォルトに戻す
+    container.style.cursor = "default";
+
+    // ページングを終了
+    isPaging = false;
+
     // トップページ以外に行く時はスクロール位置をトップに戻す（現在のスクロールは保存）
     // MEMO: 本当はスクロール処理を近い位置におきたいが後続処理のheight計算で狂うため
     if (currentContentPage !== null) {
@@ -356,37 +362,20 @@ function draw() {
       window.scrollTo(0, 0);
     }
 
-    window.innerHeight < window.innerWidth / 2
-      ? window.innerHeight * 4
-      : window.innerHeight * 2.3;
-
-    const topHeight =
-      window.innerHeight < window.innerWidth / 2
-        ? window.innerHeight * 4
-        : window.innerHeight * 2;
-    const contentHeight =
-      window.innerHeight > (window.innerWidth / 3) * 2
-        ? window.innerHeight * 1.5
-        : window.innerHeight * 2.3;
-
-    if (container && canvas) {
-      container.style.height =
-        currentContentPage === null ? `${topHeight}px` : `${contentHeight}px`;
-      canvas.height = currentContentPage === null ? topHeight : contentHeight;
-    }
-    isPaging = false;
-    if (container) {
-      container.style.cursor = "default";
+    if (currentContentPage !== null) {
+      const contentHeight =
+        imageContents.find((content) => content.title === currentContentPage)
+          ?.contentTotalHeight ?? 0;
+      canvas.height = contentHeight;
+      container.style.height = `${contentHeight}px`;
+      return;
     }
 
-    // トップページに戻った時にはスクロール位置を復活させる
-    if (currentContentPage === null) {
-      window.scrollTo(currentScrollX, currentScrollY);
-    }
-
-    if (currentContentPage === null) {
-      currentContent = null;
-    }
+    // トップページに戻った時にはheightやスクロール位置を復活させる
+    canvas.height = topCanvasHeight;
+    container.style.height = `${topCanvasHeight}px`;
+    window.scrollTo(currentScrollX, currentScrollY);
+    currentContent = null;
   }
 }
 
@@ -417,15 +406,15 @@ function drawTop() {
     titleHeight + 60,
     "center",
     "bold",
-    "rgba(0, 175,204, .5)",
-    "#0068b7"
+    "#00afcc",
+    "rgba(255, 255, 255, 0.8)"
   );
   drawScrollDown();
   text?.drawText(
     "Contents",
     60,
     100,
-    canvasHeight / 2 + 100,
+    titleHeight * 2 + 100,
     "left",
     "bold",
     "#fff"
@@ -434,19 +423,10 @@ function drawTop() {
     "気になる画像をクリックしてみてください",
     20,
     100,
-    canvasHeight / 2 + 160,
+    titleHeight * 2 + 160,
     "left",
     "",
     "#fff"
-  );
-  text?.drawText(
-    "© 2024 iwa moe",
-    14,
-    canvasWidth / 2,
-    canvasHeight - 20,
-    "center",
-    "",
-    "#abb1b5"
   );
 
   imageContents.forEach((contentImage) => {
@@ -475,7 +455,22 @@ function drawContent() {
   if (!currentContent) {
     throw new Error("cannot get currentContent");
   }
-  currentContent.drawContent(pagingStartFrame);
+  currentContent.drawContent();
+}
+
+function drawCopy() {
+  if (ctx == null || canvas == null) {
+    throw new Error("cannot get canvas");
+  }
+  text?.drawText(
+    "© 2024 iwa moe",
+    14,
+    canvas.width / 2,
+    canvas.height - 30,
+    "center",
+    "",
+    "#fff"
+  );
 }
 
 function drawScrollDown() {
@@ -489,7 +484,7 @@ function drawScrollDown() {
   ctx.save();
   ctx.beginPath();
   ctx.lineWidth = 2;
-  ctx.strokeStyle = "#fff";
+  ctx.strokeStyle = "#00afcc";
 
   const startX = canvasWidth / 2;
   const startY = startHeight - 130;
@@ -500,7 +495,7 @@ function drawScrollDown() {
 
   ctx.moveTo(startX, startY);
 
-  const totalFrames = 50;
+  const totalFrames = 80;
   const progress = (frame % totalFrames) / totalFrames;
 
   if (progress < 0.5) {
@@ -525,7 +520,7 @@ function drawScrollDown() {
     startHeight - 20,
     "center",
     "",
-    "#fff"
+    "#00afcc"
   );
 }
 
@@ -558,7 +553,6 @@ function update() {
   }
 
   // 各インスタンスの更新
-  console.log(frame, "frame");
   frame++;
   sea?.update();
 
@@ -578,6 +572,7 @@ function animate(timestamp: number) {
   if (timestamp - lastTime > interval) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     draw();
+    drawCopy();
     update();
     lastTime = timestamp;
     frame++;

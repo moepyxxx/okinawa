@@ -76,7 +76,7 @@ export class Title extends DrawObject {
 
   drawSun() {
     this.ctx.save();
-    this.ctx.fillStyle = "rgba(0, 175,204, .5)";
+    this.ctx.fillStyle = "#00afcc";
     this.ctx.beginPath();
     this.ctx.arc(this.startX + 100, this.titleHeight - 180, 50, 0, Math.PI * 2);
     this.ctx.closePath();
@@ -95,7 +95,7 @@ export class Title extends DrawObject {
         70,
         degree === 0 ? this.sumWidth - 100 : length
       );
-      this.ctx.strokeStyle = "rgba(0, 175,204, .5)";
+      this.ctx.strokeStyle = "#00afcc";
       this.ctx.lineWidth = 3;
       this.ctx.lineJoin = "round";
       this.ctx.lineCap = "round";

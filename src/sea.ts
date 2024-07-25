@@ -15,7 +15,7 @@ export class Sea extends DrawObject {
     super(canvas, ctx);
 
     this.baseXStart = -(this.canvas.width / 6);
-    this.baseYStart = this.canvas.width / 5;
+    this.baseYStart = 0;
     this.baseMiddle = this.canvas.width / 2;
     this.baseEnd = this.canvas.width;
     this.baseYEnd = (this.canvas.height / 4) * 2 + this.baseYStart;
@@ -32,7 +32,7 @@ export class Sea extends DrawObject {
        * -50〜50の間をspeed10の速さで行き来するsin波を作る
        * 値が大きければspeedは小さくなる
        */
-      const moveSpeed = moveRange - 20;
+      const moveSpeed = moveRange - 10;
       const offset = moveRange * Math.sin(this.frame / moveSpeed);
 
       let waveX = 0;

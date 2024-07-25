@@ -15,6 +15,16 @@ export class ImageContent extends DrawObject {
   topImageWidth: number;
   topImageHeight: number;
   topImageRadius: number;
+  heroImageWidth: number;
+  heroImageHeight: number;
+  subImageWidth: number;
+  subImageHeight: number;
+  subImageRowHeight1: number;
+  subImageRowHeight2: number;
+
+  contentTotalHeight: number;
+
+  pagingStartFrame: number | null = null;
 
   constructor(
     canvas: HTMLCanvasElement,
@@ -46,6 +56,26 @@ export class ImageContent extends DrawObject {
     this.topImageWidth = (canvas.width - 200 - 40 * 3) / 3;
     this.topImageHeight = this.topImageWidth * (2 / 3);
     this.topImageRadius = 20;
+
+    // 計算
+    this.heroImageWidth = (this.canvas.width / 3) * 2;
+    this.heroImageHeight = ((this.canvas.width / 3) * 2 * 2) / 3;
+
+    this.subImageWidth = (((this.canvas.width / 10) * 5.3) / 3) * 2;
+    this.subImageHeight = ((((this.canvas.width / 10) * 5.3) / 3) * 2 * 2) / 3;
+    this.subImageRowHeight1 = this.heroImageHeight + 200;
+    this.subImageRowHeight2 =
+      this.subImageRowHeight1 +
+      this.subImageHeight +
+      (this.canvas.width * 0.47 - this.subImageWidth) / 2;
+
+    const bodyTotalHeight =
+      this.heroImageHeight + 300 + 32 * this.bodies.length + 32;
+    const subImageTotalHeight = this.subImageRowHeight2 + this.subImageHeight;
+    const endOffset = 300;
+
+    this.contentTotalHeight =
+      Math.max(bodyTotalHeight, subImageTotalHeight) + endOffset;
   }
 
   async loadImage(src: string): Promise<HTMLImageElement> {
@@ -62,7 +92,7 @@ export class ImageContent extends DrawObject {
 
     // offsetの計算 (-15から15の間を行き来する)
     const amplitude = 15; // 振幅
-    const frequency = 0.1; // 周波数 (値が小さいほど遅くなる)
+    const frequency = 0.07; // 周波数 (値が小さいほど遅くなる)
     const offset = amplitude * Math.sin(frequency * this.frame);
 
     this.ctx.save();
@@ -210,12 +240,16 @@ export class ImageContent extends DrawObject {
 
   removeCurrentContent() {
     this.isCurrentImageContent = false;
+    this.pagingStartFrame = null;
     window.removeEventListener("click", this.clickListener);
     window.removeEventListener("mousemove", this.mouseMoveListener);
   }
 
-  drawContent(elapsedFrame: number) {
+  drawContent() {
     if (!this.image) return;
+    if (this.pagingStartFrame == null) {
+      this.pagingStartFrame = this.frame;
+    }
 
     // 戻るページ
     this.ctx.save();
@@ -231,17 +265,10 @@ export class ImageContent extends DrawObject {
     );
     this.ctx.restore();
 
-    const topImageWidth = (this.canvas.width / 3) * 2;
-    const topImageHeight = ((this.canvas.width / 3) * 2 * 2) / 3;
-
-    const subImageWidth = (this.canvas.width / 6) * 2;
-    const subImageHeight = ((this.canvas.width / 6) * 2 * 2) / 3;
-
-    const totalFrames = 20;
-    // 80フレーム後には完全に表示されるのでその待ち時間
-    const offsetFrames = 80;
+    const totalFrames = 10;
     const progress = this.isCurrentImageContent
-      ? (this.frame - elapsedFrame - offsetFrames) / totalFrames
+      ? (this.frame - this.pagingStartFrame) /
+        (this.pagingStartFrame + totalFrames - this.pagingStartFrame)
       : 1;
 
     const topImageProgressWidth =
@@ -250,6 +277,7 @@ export class ImageContent extends DrawObject {
           100 +
           (this.canvas.width / 3 - (this.canvas.width / 3 + 100)) * progress
         : this.canvas.width / 3;
+
     // TOP画像
     this.ctx.save();
     this.ctx.globalAlpha = progress;
@@ -257,8 +285,8 @@ export class ImageContent extends DrawObject {
       this.image,
       topImageProgressWidth,
       0,
-      topImageWidth,
-      topImageHeight
+      this.heroImageWidth,
+      this.heroImageHeight
     );
     this.ctx.restore();
 
@@ -270,7 +298,7 @@ export class ImageContent extends DrawObject {
     this.drawTextWithKerning(
       this.title.split(""),
       this.canvas.width / 10,
-      topImageHeight / 2,
+      this.heroImageHeight / 2,
       20,
       "bold 132px Arial",
       "#fff"
@@ -282,7 +310,7 @@ export class ImageContent extends DrawObject {
     this.drawTextWithKerning(
       this.subTitle.split(""),
       this.canvas.width / 10,
-      topImageHeight / 2 + 100,
+      this.heroImageHeight / 2 + 100,
       4,
       "24px Arial",
       `rgba(255, 255, 255, ${progress})`
@@ -290,9 +318,11 @@ export class ImageContent extends DrawObject {
     this.ctx.restore();
 
     // 本文
-    const bodyTotalFrames = 100;
+    const bodyTotalFrames = 50;
+    const bodyStartFrame = this.pagingStartFrame + 10;
     const bodyProgress = this.isCurrentImageContent
-      ? (this.frame - elapsedFrame - offsetFrames) / bodyTotalFrames
+      ? (this.frame - bodyStartFrame) /
+        (bodyStartFrame + bodyTotalFrames - bodyStartFrame)
       : 1;
 
     const bodyProgressCount =
@@ -316,8 +346,8 @@ export class ImageContent extends DrawObject {
     this.bodies.forEach((body, i) => {
       this.drawTextWithKerning(
         body.split(""),
-        (this.canvas.width / 10) * 5,
-        topImageHeight + this.canvas.height / 10 + subImageHeight / 2 + 32 * i,
+        (this.canvas.width / 10) * 4.7,
+        this.heroImageHeight + 300 + 32 * i,
         4,
         "16px Arial",
         "rgba(255, 255, 255, 0.5)"
@@ -329,8 +359,8 @@ export class ImageContent extends DrawObject {
         i === bodyIndex
           ? this.bodies[i].split("").slice(0, bodyCount)
           : this.bodies[i].split(""),
-        (this.canvas.width / 10) * 5,
-        topImageHeight + this.canvas.height / 10 + subImageHeight / 2 + 32 * i,
+        (this.canvas.width / 10) * 4.7,
+        this.heroImageHeight + 300 + 32 * i,
         4,
         "16px Arial",
         `rgba(255, 255, 255, ${opacity})`
@@ -348,19 +378,16 @@ export class ImageContent extends DrawObject {
     this.ctx.drawImage(
       this.subImages[0],
       0,
-      topImageHeight + this.canvas.height / 10,
-      subImageWidth,
-      subImageHeight
+      this.subImageRowHeight1,
+      this.subImageWidth,
+      this.subImageHeight
     );
     this.ctx.drawImage(
       this.subImages[1],
-      this.canvas.width / 8,
-      topImageHeight +
-        this.canvas.height / 10 +
-        subImageHeight +
-        this.canvas.height / 20,
-      subImageWidth,
-      subImageHeight
+      (this.canvas.width * 0.47 - this.subImageWidth) / 2,
+      this.subImageRowHeight2,
+      this.subImageWidth,
+      this.subImageHeight
     );
     this.ctx.restore();
   }
