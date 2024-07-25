@@ -14,6 +14,9 @@ let titleHeight: number;
 
 let animationId: number | null;
 let frame: number = 0;
+let lastTime: number;
+let fps: number;
+let interval: number;
 
 let isPaging: boolean = false;
 let pagingStartFrame: number = 0;
@@ -35,18 +38,21 @@ let currentScrollX = 0;
 let currentScrollY = 0;
 
 setup();
-animate();
+animate(0);
 
 window.addEventListener("resize", () => {
   if (animationId !== null) {
     cancelAnimationFrame(animationId);
   }
   setup();
-  animate();
+  animate(0);
 });
 
 function setup() {
   animationId = null;
+  lastTime = 0;
+  fps = 20;
+  interval = 1000 / fps;
 
   canvas = document.querySelector("canvas");
   ctx = canvas?.getContext("2d") ?? null;
@@ -59,16 +65,19 @@ function setup() {
   canvas.height =
     window.innerHeight < window.innerWidth / 2
       ? window.innerHeight * 4
-      : window.innerHeight * 2;
+      : window.innerHeight * 2.3;
   container.style.height = `${
     window.innerHeight < window.innerWidth / 2
       ? window.innerHeight * 4
-      : window.innerHeight * 2
+      : window.innerHeight * 2.3
   }px`;
   canvas.style.backgroundColor = "#fdf5e6";
   ctx.fillStyle = "#fff";
   ctx.strokeStyle = "#fff";
-  titleHeight = canvas.height / 4;
+  titleHeight =
+    window.innerHeight < window.innerWidth / 2
+      ? canvas.height / 4
+      : ((canvas.height / 2.3) * 1) / 2;
 
   sea = new Sea(canvas, ctx);
   bubble = new Bubble(canvas, ctx);
@@ -349,7 +358,7 @@ function draw() {
 
     window.innerHeight < window.innerWidth / 2
       ? window.innerHeight * 4
-      : window.innerHeight * 2;
+      : window.innerHeight * 2.3;
 
     const topHeight =
       window.innerHeight < window.innerWidth / 2
@@ -358,7 +367,7 @@ function draw() {
     const contentHeight =
       window.innerHeight > (window.innerWidth / 3) * 2
         ? window.innerHeight * 1.5
-        : window.innerHeight * 2;
+        : window.innerHeight * 2.3;
 
     if (container && canvas) {
       container.style.height =
@@ -549,6 +558,7 @@ function update() {
   }
 
   // 各インスタンスの更新
+  console.log(frame, "frame");
   frame++;
   sea?.update();
 
@@ -560,13 +570,17 @@ function update() {
   weather?.update();
 }
 
-function animate() {
+function animate(timestamp: number) {
   if (canvas == null || ctx == null) {
     throw new Error("cannot get canvas");
   }
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  draw();
-  update();
 
+  if (timestamp - lastTime > interval) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    draw();
+    update();
+    lastTime = timestamp;
+    frame++;
+  }
   animationId = requestAnimationFrame(animate);
 }
