@@ -234,14 +234,14 @@ export class ImageContent extends DrawObject {
 
   setCurrentContent() {
     this.isCurrentImageContent = true;
-    window.removeEventListener("click", this.clickListener);
-    window.removeEventListener("mousemove", this.mouseMoveListener);
+    window.addEventListener("click", this.clickListener);
+    window.addEventListener("mousemove", this.mouseMoveListener);
   }
 
   removeCurrentContent() {
     this.isCurrentImageContent = false;
-    window.addEventListener("click", this.clickListener);
-    window.addEventListener("mousemove", this.mouseMoveListener);
+    window.removeEventListener("click", this.clickListener);
+    window.removeEventListener("mousemove", this.mouseMoveListener);
   }
 
   drawContent() {
