@@ -65,7 +65,7 @@ function setup() {
     throw new Error("cannot get canvas");
   }
 
-  canvas.width = window.innerWidth;
+  canvas.width = window.innerWidth >= 1800 ? 1800 : window.innerWidth;
   canvas.style.backgroundColor = "#fdf5e6";
   ctx.fillStyle = "#fff";
   ctx.strokeStyle = "#fff";

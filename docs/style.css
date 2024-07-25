@@ -10,10 +10,13 @@ canvas {
   display: block;
   overflow: auto; /* スクロールバーを表示 */
   scroll-behavior: smooth; /* CSSによるスムーズスクロール */
+  background-color: #00afcc;
 }
 
 .container {
   display: none;
+  margin: 0 auto;
+  max-width: 1800px;
 }
 
 .alert {
