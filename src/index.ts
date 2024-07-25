@@ -283,15 +283,15 @@ function setup() {
     });
   });
   window.addEventListener("mousemove", (e) => {
-    if (!container) return;
+    if (!canvas) return;
 
     const isHovered = imageContents.some((content) =>
       content.isPointInImage(e.offsetX, e.offsetY)
     );
     if (isHovered) {
-      container.style.cursor = "pointer";
+      canvas.style.cursor = "pointer";
     } else {
-      container.style.cursor = "default";
+      canvas.style.cursor = "default";
     }
   });
 
@@ -349,7 +349,7 @@ function draw() {
   // ページング終わり
   if (isPaging && frame - pagingStartFrame === pagingTotalFrames + 30) {
     // カーソルをデフォルトに戻す
-    container.style.cursor = "default";
+    canvas.style.cursor = "default";
 
     // ページングを終了
     isPaging = false;
