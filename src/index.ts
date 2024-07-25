@@ -1,4 +1,3 @@
-import { max } from "lodash-es";
 import { Bird } from "./bird";
 import { Bubble } from "./bubble";
 import { FootPrint } from "./footPrint";
@@ -18,6 +17,9 @@ let frame: number = 0;
 let lastTime: number;
 let fps: number;
 let interval: number;
+
+let imageContentClickHandler: (e: MouseEvent) => void;
+let imageContentMousemoveHandler: (e: MouseEvent) => void;
 
 // トップページのcanvasの高さは計算で求める
 let topCanvasHeight: number;
@@ -272,8 +274,8 @@ function setup() {
       ),
     ]
   );
-  imageContents.forEach((contentImage) => {
-    window.addEventListener("click", (e) => {
+  imageContentClickHandler = (e) => {
+    imageContents.forEach((contentImage) => {
       const isClicked = contentImage.isPointInImage(e.offsetX, e.offsetY);
       if (isClicked) {
         currentContentPage = contentImage.title;
@@ -281,8 +283,8 @@ function setup() {
         pagingStartFrame = frame;
       }
     });
-  });
-  window.addEventListener("mousemove", (e) => {
+  };
+  imageContentMousemoveHandler = (e) => {
     if (!canvas) return;
 
     const isHovered = imageContents.some((content) =>
@@ -293,7 +295,9 @@ function setup() {
     } else {
       canvas.style.cursor = "default";
     }
-  });
+  };
+  window.addEventListener("click", imageContentClickHandler);
+  window.addEventListener("mousemove", imageContentMousemoveHandler);
 
   sea = new Sea(canvas, ctx);
   bubble = new Bubble(canvas, ctx);
@@ -529,8 +533,12 @@ function update() {
     throw new Error("cannot get canvas");
   }
 
-  // コンテンツがある場合は準備
+  // コンテンツがある場合はコンテンツページの準備
   if (currentContentPage !== null && currentContent === null) {
+    // 画像クリックを無効化
+    window.removeEventListener("click", imageContentClickHandler);
+    window.removeEventListener("mousemove", imageContentMousemoveHandler);
+
     const contentImage = imageContents.find(
       (content) => content.title === currentContentPage
     );
@@ -540,12 +548,17 @@ function update() {
     currentContent = contentImage;
     currentContent.setCurrentContent();
   }
-  // コンテンツがあるが表示が終わっている場合
+  // コンテンツがあるが繊維がはじまっている場合はTOPページの準備
+  // ここからTOPに戻るアニメーション
   if (
     currentContentPage !== null &&
     currentContent !== null &&
     currentContent.isCurrentImageContent === false
   ) {
+    // 画像クリックを復活させる
+    window.addEventListener("click", imageContentClickHandler);
+    window.addEventListener("mousemove", imageContentMousemoveHandler);
+
     currentContent.removeCurrentContent();
     currentContentPage = null;
     isPaging = true;
