@@ -307,11 +307,12 @@ function setup() {
 }
 
 function draw() {
-  if (ctx == null) {
+  if (ctx == null || canvas == null) {
     throw new Error("cannot get canvas");
   }
 
   if (!isPaging && currentContentPage === null) {
+    canvas.style.backgroundColor = "#fdf5e6";
     drawTop();
   }
 
@@ -429,17 +430,20 @@ function drawTop() {
 }
 
 function drawContentBackground(progress: number = 1) {
-  if (ctx == null) {
+  if (ctx == null || canvas == null) {
     throw new Error("cannot get canvas");
   }
-  const canvasWidth = canvas?.width ?? 0;
-  const canvasHeight = canvas?.height ?? 0;
+
   ctx.save();
   ctx.beginPath();
-  ctx.rect(0, 0, canvasWidth, canvasHeight);
+  ctx.rect(0, 0, canvas.width, canvas.height);
   ctx.fillStyle = `rgba(0, 175, 204, ${progress})`;
   ctx.fill();
   ctx.restore();
+
+  if (progress > 0.95) {
+    canvas.style.backgroundColor = "rgba(0, 175, 204, 1)";
+  }
 }
 
 function drawContent() {
