@@ -20,8 +20,8 @@ export class SeaWaterDrop extends DrawObject {
     if (this.isEnd) {
       return;
     }
-    const startFrames = [0, 5, 12, 19, 25];
-    const totalFrames = 20;
+    const startFrames = [0, 10, 25, 35, 50];
+    const totalFrames = 60;
 
     this.ctx.save();
     for (let i = 0; i < startFrames.length - 1; i++) {

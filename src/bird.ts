@@ -16,7 +16,7 @@ export class Bird extends DrawObject {
   }
 
   draw() {
-    const speed = 30;
+    const speed = 10;
     const offset = 400;
     if (this.isBirdRotating) {
       // まだ回転していない場合はターゲットと回転ターゲット度数を決める

@@ -30,7 +30,7 @@ export class FootPrint extends DrawObject {
   }
 
   draw() {
-    const maxCount = this.frame / 10;
+    const maxCount = this.frame / 20;
     let count = 0;
     if (maxCount === 0) return;
 

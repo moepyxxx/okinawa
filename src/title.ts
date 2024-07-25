@@ -13,6 +13,8 @@ export class Title extends DrawObject {
   sumWidth: number = 0;
   startX: number = 0;
 
+  sunRandomWidth: Partial<Record<number, number>> = {};
+
   constructor(
     canvas: HTMLCanvasElement,
     ctx: CanvasRenderingContext2D,
@@ -49,7 +51,7 @@ export class Title extends DrawObject {
     const endHue2 = 100;
 
     // 補間値を計算
-    const t = (Math.sin(this.frame / 20) + 1) / 2; // 0から1までの範囲で循環する値を生成
+    const t = (Math.sin(this.frame / 80) + 1) / 2; // 0から1までの範囲で循環する値を生成
 
     const hue1 = startHue1 * (1 - t) + endHue1 * t;
     const hue2 = startHue2 * (1 - t) + endHue2 * t;
@@ -81,14 +83,17 @@ export class Title extends DrawObject {
     this.ctx.fill();
 
     for (let degree = 0; degree < 360; degree += 15) {
+      if (this.frame % 15 === 0) {
+        this.sunRandomWidth[degree] =
+          Math.floor(Math.random() * (150 - 120 + 1)) + 120;
+      }
+      const length = this.sunRandomWidth[degree] ?? 0;
       const { A, B } = this.getCoordinatesFromAngle(
         this.startX + 100,
         this.titleHeight - 180,
         degree,
         70,
-        degree === 0
-          ? this.sumWidth - 100
-          : Math.floor(Math.random() * (150 - 120 + 1)) + 120
+        degree === 0 ? this.sumWidth - 100 : length
       );
       this.ctx.strokeStyle = "rgba(0, 175,204, .5)";
       this.ctx.lineWidth = 3;

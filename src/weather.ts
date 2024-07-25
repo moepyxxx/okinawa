@@ -114,7 +114,7 @@ export class Weather extends DrawObject {
       }
     }
 
-    if (this.frame % 100 === 0) {
+    if (this.frame % 300 === 0) {
       this.changeWeather(this.weather === "sunny" ? "rainy" : "sunny");
     }
   }
@@ -130,7 +130,7 @@ export class Weather extends DrawObject {
 
     let color =
       this.weather === "sunny" ? "rgba(0, 0, 0, 0)" : "rgba(0, 0, 0, 0.2)";
-    const totalFrames = 20;
+    const totalFrames = 40;
 
     if (this.isChanging && this.frame - this.startChangeFrame < totalFrames) {
       const progress = (this.frame - this.startChangeFrame) / totalFrames;

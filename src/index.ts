@@ -471,7 +471,7 @@ function drawScrollDown() {
 
   ctx.moveTo(startX, startY);
 
-  const totalFrames = 30;
+  const totalFrames = 50;
   const progress = (frame % totalFrames) / totalFrames;
 
   if (progress < 0.5) {

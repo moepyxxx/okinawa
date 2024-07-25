@@ -20,7 +20,7 @@ export class SandyWaterDrop extends DrawObject {
       return;
     }
 
-    const totalFrames = 50;
+    const totalFrames = 100;
     const progress = this.frame / totalFrames;
     if (progress > 1) {
       this.isEnd = true;
