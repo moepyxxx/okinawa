@@ -31,6 +31,9 @@ let text: Text | null = null;
 let imageContents: ImageContent[] = [];
 let weather: Weather | null = null;
 
+let currentScrollX = 0;
+let currentScrollY = 0;
+
 setup();
 animate();
 
@@ -336,6 +339,14 @@ function draw() {
 
   // ページング終わり
   if (isPaging && frame - pagingStartFrame === pagingTotalFrames + 30) {
+    // トップページ以外に行く時はスクロール位置をトップに戻す（現在のスクロールは保存）
+    // MEMO: 本当はスクロール処理を近い位置におきたいが後続処理のheight計算で狂うため
+    if (currentContentPage !== null) {
+      currentScrollX = window.scrollX;
+      currentScrollY = window.scrollY;
+      window.scrollTo(0, 0);
+    }
+
     window.innerHeight < window.innerWidth / 2
       ? window.innerHeight * 4
       : window.innerHeight * 2;
@@ -348,7 +359,7 @@ function draw() {
       window.innerHeight > (window.innerWidth / 3) * 2
         ? window.innerHeight * 1.5
         : window.innerHeight * 2;
-    window.scrollTo(0, 0);
+
     if (container && canvas) {
       container.style.height =
         currentContentPage === null ? `${topHeight}px` : `${contentHeight}px`;
@@ -357,6 +368,11 @@ function draw() {
     isPaging = false;
     if (container) {
       container.style.cursor = "default";
+    }
+
+    // トップページに戻った時にはスクロール位置を復活させる
+    if (currentContentPage === null) {
+      window.scrollTo(currentScrollX, currentScrollY);
     }
 
     if (currentContentPage === null) {
